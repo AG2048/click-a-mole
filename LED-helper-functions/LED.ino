@@ -1,11 +1,12 @@
 #include <FastLED.h>
-#define NUM_LEDS 60
+#include "LED.h"
 #define DATA_PIN 6
+#define NUM_LEDS 318
 
 CRGB leds[NUM_LEDS];
  
 void setup() { 
-  FastLED.addLeds<WS2812B, 4, GRB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(50);
   Serial.begin(9600);
 }
