@@ -1,6 +1,34 @@
 # click-a-mole
 Click A Mole :>
 
+## Directory Structure
+```
+/README.md
+/click_a_mole
+  /click_a_mole.ino
+  /game_logic
+    /game_logic.h
+    /game_logic.cpp
+    /tests
+      /<test_name>
+        /<test_name>.ino
+  /motor_interface
+    /motor_interface.h
+    /motor_interface.cpp
+    /tests
+      /<test_name>
+        /<test_name>.ino
+  /led_interface
+    /led_interface.h
+    /led_interface.cpp
+    /tests
+      /<test_name>
+        /<test_name>.ino
+/leaderboard
+  ...
+```
+
+
 ## Editing Convention
 Whenever you wish to add a new feature:
 1. Create a branch.
