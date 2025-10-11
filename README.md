@@ -44,7 +44,8 @@ Whenever you wish to add a new feature:
    - The later-merged log should appear BELOW every previously merged branch.
 
 ## LOG
+### \<Branch Merge NAME\> - Start: \<Date\> - Merged: \<Date\>
+\<What this merge is supposed to do\>
 
-### \<Actuator_stepperMotor> - Start: \<Oct4\> - Merged: \<Oct11\>
-
+### 25-10-04_actuator_stepperMotor - Start: 2025 Oct 4 - Merged: 2025 Oct 11
 Working test case with motor with the magnetic encoder to measure the angle
