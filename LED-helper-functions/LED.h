@@ -1,5 +1,7 @@
 #ifndef LED_H
 #define LED_H
+#include <Arduino.h>
+#include <FastLED.h>
 
 
 /*
@@ -16,7 +18,7 @@ leds/heart: 1
 #define LEDS_PER_LINEAR 5
 #define LEDS_PER_HEART 1
 
-const int rings_index[] = RINGS_INDEX
+const int rings_index[] = RINGS_INDEX;
 const int linears_index[] = LINE_INDEX;
 const int hearts_index[] = HEARTS_INDEX;
 
@@ -26,17 +28,6 @@ enum Color {
     BLUE
 };
 
-CRGB toCRGB(Color c) {
-    
-    switch (c) {
-        case Color::RED: 
-            return CRGB::Red;
-        case Color::Greeen: 
-            return CRGB(100, 200, 40);
-        default: 
-            return CRGB::Black; // fallback
-    }
-}
 
 /*
 Example call
@@ -48,6 +39,7 @@ void adjust_linear_lights(int moleIndex, Color colourMode, int clicksLeft);
 void adjust_ring_lights(int moleIndex, Color colourMode, int currentTime, int maxTime);
 void adjust_heart_lights(int currentLivesLeft);
 void adjust_score_lights(int currentScore); 
+CRGB toCRGB(Color c);
 
 #endif 
 
