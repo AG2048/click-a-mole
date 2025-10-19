@@ -1,0 +1,21 @@
+table {
+  border-collapse: collapse;
+  width: 50%;
+  margin: 20px auto;
+}
+
+th,td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
+
+body {
+  background-color: beige;
+  font-family: Poppins, sans-serif;
+}
+
+h1{
+    text-align: center;
+    margin: 0% auto;
+}
