@@ -64,7 +64,7 @@ class DisplayInterface {
         // 7-seg helper functions
         show_score(int current_score); 
         turn_off_score(); 
-        game_start(unsigned long current_time_ms, unsigned long duration_ms); 
+        game_start(); 
         game_over(); 
 
         // ring timer + mole hp bar helper functions
