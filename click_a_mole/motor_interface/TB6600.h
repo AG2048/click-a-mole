@@ -6,7 +6,6 @@
 class TB6600 {
     public:
         TB6600();
-
         
     private:
 
