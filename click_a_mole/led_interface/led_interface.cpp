@@ -45,9 +45,15 @@ process_animation(unsigned long overall_current_time_ms){
 }
 
 void check_duplicate_animations(int animation_mole_id, vector<*AnimationObject>* animation_list){
-    for (int i = 0; i < animation_list.size(); i++){
-        if (animation_list[i] -> mole_id == animation_mole_id){
-            // delete the animation memory properly 
+    // removing elements based on a condition
+    if (animation_list -> empty()){
+        return;
+    }
+    
+    for (int i = animation_list -> size() - 1; i >= 0; i--){
+        if ((*animation_list)[i] -> mole_id == animation_mole_id){
+            delete(*animation_list)[i];
+            animation_list -> erase(animation_list -> begin() + i);
         }
     }
 
