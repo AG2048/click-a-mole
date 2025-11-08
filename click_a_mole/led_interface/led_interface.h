@@ -50,7 +50,7 @@ class DisplayInterface {
             //missing 7-seg and oled display info (data pins, # of leds)
         ); 
         ~DisplayInterface(); 
-        process_timed_animations(unsigned long current_time_ms);
+        void process_timed_animations(unsigned long current_time_ms);
 
         // general helper functions
         power_on_showcase(); 
@@ -68,13 +68,13 @@ class DisplayInterface {
         game_over(); 
 
         // ring timer + mole hp bar helper functions
-        start_mole(int mole_id, int max_hp, unsigned long duration_ms, const vector<>& colors = {Color::Green}); 
-        change_mole_hp(int mole_id, int new_hp, int max_hp); 
-        end_mole(int mole_id, bool is_timeout, bool is_hp_zero); 
+        void start_mole(int mole_id, int max_hp, unsigned long duration_ms, const vector<>& colors = {Color::Green}); 
+        void change_mole_hp(int mole_id, int new_hp, int max_hp); 
+        void end_mole(int mole_id, bool is_timeout, bool is_hp_zero); 
 
         // round transition helper functions 
-        win_round(); 
-        lose_round(); 
+        void win_round(); 
+        void lose_round(); 
         changeDuration(newDuration); 
         changeDuration(moleID, newDuration) 
 
@@ -84,7 +84,7 @@ class DisplayInterface {
         prompt_leaderboard_name_entry() 
         entering_names_to_leaderboard(char first_letter, char second_letter, char third_letter, int final_score, bool confirm) 
         show_leaderboard(vector<LeaderboardEntry> leaderboard) 
-        
+
         
     private:
         vector<*AnimationObject> animation_list;
