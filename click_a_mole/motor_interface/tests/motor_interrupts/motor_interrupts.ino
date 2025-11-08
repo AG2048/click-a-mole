@@ -3,7 +3,7 @@
 #include <util/atomic.h>
 
 #define F_CPU 16000000
-#define T1_CMPA 1600
+#define T1_CMPA 800
 #define NUM_MOTORS 2
 
 struct pin_t {
@@ -79,7 +79,7 @@ void loop() {
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     for (int i = 0; i < NUM_MOTORS; i++) {
       motor_dir[i] = !motor_dir[i];
-      motor_hsteps[i] += 30000;
+      motor_hsteps[i] += 3200; // motor is set at 1600 microstep per revolution, so 3200 is one revolution
     }
   }
 
