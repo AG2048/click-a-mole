@@ -27,12 +27,12 @@ struct AnimationObject{
     LedType led_type;
     AnimationCategory animation_type;
     int mole_id; 
+    unsigned long start_time_ms;
+    unsigned long end_time_ms; //calculated from the current time (determined using millis() at start of function call) + duration 
+    AnimationObject* animation_to_return_to;    
     Colour colour_1; // 
     Colour colour_2; // used for patterns requiring more than 1 colour
     Colour colour_3;  // used for patterns requiring more than 2 colours
-    unsigned long start_time_ms;
-    unsigned long end_time_ms; //calculated from the current time (determined using millis() at start of function call) + duration 
-    AnimationObject* animation_to_return_to;
 
 }
 

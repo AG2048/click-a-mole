@@ -13,6 +13,17 @@ void render_blinking_ani(AnimationObject* animation_);
 void render_wave_ani(AnimationObject* animation_);
 void remove_mole_animation(int mole_id_);
 void remove_all_animation();
+void queue_Animation(
+    LedType led_type,
+    AnimationCategory animation_type,
+    int mole_id,
+    unsigned long duration_ms,
+    AnimationObject* animation_to_return_to,
+    Colour colour_1,  
+    Colour colour_2 = Colour::Black,
+    Colour colour_3 = Colour::Black;
+);
+
 
 AnimationObject* find_mole_animation(int mole_id_, LedType led_type);
 
@@ -25,6 +36,8 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
     remove_mole_animation(mole_id);
 
     AnimationObject* new_mole_ring = new AnimationObject();
+
+
     new_mole_ring -> led_type = LedType::Ring;
     new_mole_ring -> animation_type = AnimationCategory::Solid;
     new_mole_ring -> mole_id = mole_id;
@@ -43,6 +56,7 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
     animation_list.push_back(new_mole_ring);
     animation_list.push_back(new_mole_linear);
 
+    // queue animation for queueing animation
 }
 
 void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
@@ -60,8 +74,8 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
         AnimationObject* animation = animation_list[i];
 
         if (animation -> end_time_ms <= current_time_ms){ // check if animation is done
-            delete(animation);
-            animation_list -> erase(animation_list.begin() + i);
+            delete animation;
+            animation_list.erase(animation_list.begin() + i);
             
         } 
 
@@ -215,7 +229,7 @@ void remove_mole_animation(int mole_id_){
         AnimationObject* animation = animation_list[i];
 
         if (animation -> mole_id == mole_id_){ // check if animation is done
-            delete(animation);
+            delete animation;
             animation_list -> erase(animation_list.begin() + i);
                 
         } 
@@ -224,9 +238,39 @@ void remove_mole_animation(int mole_id_){
 
 void remove_all_animation(){
     for (int i = animation_list.size() - 1; i >= 0; i --){
-        delete(animation_list[i]);
+        delete animation_list[i];
         animation_list -> erase(animation_list.begin() + i);
     }
+}
+
+void queue_Animation(
+    LedType led_type,
+    AnimationCategory animation_type,
+    int mole_id,
+    unsigned long duration_ms,
+    AnimationObject* animation_to_return_to,   
+    Colour colour_1,  
+    Colour colour_2, 
+    Colour colour_3
+){
+    // Store the time when animation functions were called
+    // Create new animation object
+    const unsigned long current_time_ms = millis();
+    AnimationObject* new_ani = new AnimationObject();
+
+    new_ani->led_type = led_type;
+    new_ani->animation_type = animation_type;
+    new_ani->mole_id = mole_id;
+    new_ani->start_time_ms = current_time_ms;
+    new_ani->end_time_ms = current_time_ms + duration_ms;    
+    new_ani->colour_1 = colour_1;
+    new_ani->colour_2 = colour_2;
+    new_ani->colour_3 = colour_3;
+
+    // Add new animation object to animation list
+    animation_list.push_back(new_ani);
+
+
 }
 
 int calculate_mole_led_(int mole_id){ // return the starting index of the mole leds for that mole
