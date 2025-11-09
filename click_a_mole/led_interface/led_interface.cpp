@@ -108,23 +108,6 @@ void render_animation(AnimationObject* animation_, unsigned long current_time_ms
 }
 
 
-// void check_duplicate_animations(vector<*AnimationObject>* animation_list){ // queueu animation should already have all the animations queued together
-    
-//     // removing elements based on a condition
-//     if (animation_list -> empty()){
-//         return;
-//     }
-    
-//     for (int i = animation_list -> size() - 1; i >= 0; i--){
-//         if ((*animation_list)[i] -> mole_id == animation_mole_id){
-//             delete(*animation_list)[i];
-//             animation_list -> erase(animation_list -> begin() + i);
-//         }
-//     }
-
-// }
-
-
 void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
     
 }
@@ -329,3 +312,22 @@ CRGB convert_to_crgb(Colour color){
    }
 }
 
+
+
+
+
+// void check_duplicate_animations(vector<*AnimationObject>* animation_list){ // queueu animation should already have all the animations queued together
+    
+//     // removing elements based on a condition
+//     if (animation_list -> empty()){
+//         return;
+//     }
+    
+//     for (int i = animation_list -> size() - 1; i >= 0; i--){
+//         if ((*animation_list)[i] -> mole_id == animation_mole_id){
+//             delete(*animation_list)[i];
+//             animation_list -> erase(animation_list -> begin() + i);
+//         }
+//     }
+
+// }
