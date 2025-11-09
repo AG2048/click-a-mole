@@ -1,6 +1,7 @@
 #include "led_interface.h"
 #include <Arduino.h>
 #include <FastLED.h>
+#include <crgb.h>
 
 
 const int TOTAL_MOLES = 9;
@@ -21,11 +22,18 @@ void queue_Animation(
     AnimationObject* animation_to_return_to,
     Colour colour_1,  
     Colour colour_2 = Colour::Black,
-    Colour colour_3 = Colour::Black;
-);
+    Colour colour_3 = Colour::Black
+)
+
+CRGB convert_to_crgb(Colour color)
 
 
 AnimationObject* find_mole_animation(int mole_id_, LedType led_type);
+
+
+// *************************************
+// Actual Animations
+// *************************************
 
 
 // when start mole is called
@@ -36,8 +44,6 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
     remove_mole_animation(mole_id);
 
     AnimationObject* new_mole_ring = new AnimationObject();
-
-
     new_mole_ring -> led_type = LedType::Ring;
     new_mole_ring -> animation_type = AnimationCategory::Solid;
     new_mole_ring -> mole_id = mole_id;
@@ -91,7 +97,7 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
 
 void render_animation(AnimationObject* animation_, unsigned long current_time_ms_){
     if (animation_->animation_type == AnimationCategory::Solid){
-        render_solid_ani(animation_); //implement later
+        render_solid_ani(animation_, current_time_ms_); //implement later // pass in current time? for decraseing the leds as the time goes on
 
     } else if (animation_->animation_type == AnimationCategory::Blinking){
         render_blinking_ani(animation_);
@@ -280,3 +286,46 @@ int calculate_mole_led_(int mole_id){ // return the starting index of the mole l
 // start mole has top priority, when should it override other functions like the transition animation (eg. )
 // when pushing: git add., git commit -m "message", git push
 // change mole hp: change the hp bar nnumber and get ratio of new hp and full hop and see if ring should change or not
+
+
+
+// *************************************
+// Actual Animations
+// *************************************
+
+void render_solid_ani(AnimationObject* animation_){
+    // get mole id
+    // get the led list
+    // fill the list with the color
+
+    // linear and ring has diff ones
+    int mole_id = animation_->mole_id;
+    CRGB color = convert_to_crgb(animation_->colour_1);
+
+    get_starting_ind(mole_id); 
+
+    //num_leds_ring & num_leds_linear is the number of leds per ring and per linear led
+    // get the index of the list and fill them all
+
+    int startingIndex = get_starting_index(mole_id);
+    // for ring lights
+    for (int i = startingInd; i < startingInd += num_leds_ring){
+        ledArr[i] = color;
+    }
+
+}
+
+int get_starting_index(int mole_id){
+
+}
+
+CRGB convert_to_crgb(Colour color){
+   if (color == Colour::Red){
+        return CRGB::Red;
+   } else if (color == Colour::Green){
+    return CRGB::Black;
+   } else if (color == Colour::Green){
+    return CRGB::Green;
+   }
+}
+

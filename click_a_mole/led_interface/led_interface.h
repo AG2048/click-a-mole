@@ -59,7 +59,7 @@ class DisplayInterface {
         turn_on_specific_light(int mole_id, Colour colour, LedType led_type); //params tbd
 
         // player lives helper functions
-        update_heart(int lives); 
+        update_heart(int lives); // maybe store as private vairbale since its only initliazed once & 
 
         // 7-seg helper functions
         show_score(int current_score); 
