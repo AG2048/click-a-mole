@@ -72,6 +72,30 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
 
 }
 
+void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
+
+    for (int i = animation_list.size() - 1; i >= 0 ; i--){
+        AnimationObject* animation = animation_list.get(i);
+        int ani_mole_id = animation -> mole_id;
+    
+        if (animation -> end_time_ms <= current_time_ms){ // check if animation is done
+            if (animation -> led_type == LedType::Linear){
+                remove_mole_animation(ani_mole_id, LedType::Linear);
+            } else if (animation -> led_type == LedType::Ring){
+                remove_mole_animation(ani_mole_id, LedType::Ring);
+            }
+
+        } 
+
+        render_animation(animation, current_time_ms);
+    }
+
+    FastLED.show();
+
+    
+
+}
+
 
 
 
@@ -117,10 +141,14 @@ void DisplayInterface::queue_animation(
 }
 
 // remove_mole_animation
-void DisplayInterface::remove_mole_animation(int mole_id_) {
+void DisplayInterface::remove_mole_animation(int mole_id_, LedType led_type_) {
+
     for (int i = animation_list.size() - 1; i >= 0; i--) {
         AnimationObject* animation = animation_list.get(i);
-        if (animation->mole_id == mole_id_) {
+        if (animation->mole_id == mole_id_ && animation->led_type == led_type_) {
+
+            render_black_led(animation);
+
             delete animation;
             animation_list.erase(i);
         }
@@ -177,7 +205,31 @@ CRGB DisplayInterface::convert_to_crgb(Colour colour) {
 
 
 
+// *************************************
+// Rendering Animations Helper Functions
+// *************************************
 
+void DisplayInterface::render_black_led(AnimationObject* animation_){
+    int mole_id = animation_->mole_id;
+    LedType led_type = animation_->led_type;
+    int leds_per_led_type;
+
+    if (led_type == LedType::Ring){
+        leds_per_led_type == leds_per_ring;
+    } else if (led_type == LedType::Linear){
+        leds_per_led_type == leds_per_linear;
+    } else if (led_type == LedType::Heart){
+        leds_per_led_type == leds_per_heart;
+    }
+
+    CRGB black = convert_to_crgb(Colour::Black);
+
+    int start_index = convert_mole_id_led_type_to_led_index(mole_id, led_type);
+
+    for (int i = start_index; i < start_index + leds_per_led_type; i ++){
+        leds[i] = black;
+    }
+}
 
 
 

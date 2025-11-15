@@ -114,9 +114,13 @@ class DisplayInterface {
             Colour colour_4 = Colour::Black,
             Colour colour_5 = Colour::Black
         );
-        void remove_mole_animation(int mole_id_);
+        void remove_mole_animation(int mole_id_, LedType led_type_);
         void remove_all_animation();
         CRGB convert_to_crgb(Colour colour);
+
+        //internal helper functions for rendering animations
+        void render_black_led(AnimationObject* animation_);
+
 
 
 

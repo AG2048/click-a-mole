@@ -225,6 +225,7 @@ void remove_mole_animation(int mole_id_){
     }
 }
 
+
 void remove_all_animation(){
     for (int i = animation_list.size() - 1; i >= 0; i --){
         delete animation_list[i];
