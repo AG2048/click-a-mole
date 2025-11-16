@@ -5,19 +5,16 @@ class MoleModule {
     public:
         MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t sensorAddr);
 
-        void init();
+        // Gets encoder and button state, computes next motor params
+        void update();
 
-        /* 
-        Updates button state to external
-        Updates motorDir, motorSteps to internal
-        Updates encoderAngle to internal  */
-        void update(int& isPressed);
+        // Returns button value and resets RS latched state
+        int readButton();
 
-        // Sends pulse to stepper
-        void handleISR();
-
-        // Updates mole hp
+        // Update target angle based on hp
         void setHp(int currHp, int maxHp);
+
+        uint8_t getMotorParams(uint8_t& motorDir, uint32_t& motorSteps); // motorSteps needs to be atomic read
 
     private:
         TB6600 motor;
@@ -33,6 +30,13 @@ class MoleModule {
         
         int targetAngle = 0;
         int currAngle = 0;
+
+        int buttonRS = 0;
+
+        // These three don't have to be separate functions can be in update()
+        void setMotorParams();
+        int getEncoderAngle();
+        int getButtonState();
 }
 
 #endif // MOLE_MODULE_H
