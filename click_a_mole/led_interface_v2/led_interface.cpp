@@ -155,10 +155,9 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
     
         if (animation->end_time_ms <= current_time_ms){ // check if animation is done
             
-            // also check if there is animation to return to, if yes, push_back to list
             render_colour_to_led(animation, Colour::Black);
 
-
+            // also check if there is animation to return to, if yes, push_back to list
             // If animation->animation_to_return_to != nullptr, we push it back into the list.
             // Important: delete animation only deletes the AnimationObject itself.
             // It does NOT delete animation->animation_to_return_to.
@@ -341,9 +340,6 @@ int DisplayInterface::convert_led_type_to_led_index(LedType led_type, int mole_i
     }
 
 }
-
-
-
 
 
 
