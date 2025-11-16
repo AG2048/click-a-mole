@@ -1,6 +1,5 @@
 #include "AS5600.h"
 
-// constructor
 AS5600::AS5600() {
 
 }
@@ -31,7 +30,13 @@ float AS5600::readAngle() {
     int encoderVal = readEncoder();
     float degrees = (encoderVal / 4096.0) * 360.0;
 
-    return degrees - offset;
+    // handles negative values after subtracting offset
+    float correctedAngle = fmod(degrees - offset, 360.0);
+    if (correctedAngle < 0 ) {
+        correctedAngle += 360.0;
+    }
+
+    return correctedAngle;
 }
 
 // Read current angle and set it as offset

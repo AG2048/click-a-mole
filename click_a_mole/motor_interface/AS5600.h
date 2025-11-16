@@ -20,7 +20,7 @@ class AS5600 {
     private:
         uint8_t addr = 0x36;
         uint8_t angleReg = 0x0E;
-        float offset;
+        float offset = 0.0;
 
         // Read encoder value (0-4095)
         int readEncoder();
