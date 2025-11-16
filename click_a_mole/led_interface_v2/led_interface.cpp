@@ -49,7 +49,6 @@ DisplayInterface::~DisplayInterface() {
 // Public Functions
 // *************************************
 
-// start_mole()
 // Function starts the ring timer and hp bar for each mole
 void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour colours[], int colour_count) { // vector bc for one round it may be 3 lives or 5 lives so theats like 3 vs 5 colors, its green by default but if they do pass smth then itll be what they pass
 
@@ -68,6 +67,10 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
 
 }
 
+// Function decreases hp bar for each mole and plays a flash animation
+// on the ring timer to reflect that the mole was pressed,
+// immediately returns to timer animation after flash animation is done
+// NOTE: The timer doesn't pause during flash animation
 void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
 
     // should show 300 ms intermediate flash for RING
@@ -82,17 +85,27 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
             animation->current_hp = new_hp;
         }
 
-        if(animation->mole_id == mole_id && animation->led_type == LedType::Ring){
+        // remove timer animation
+        // guarantees that animation->animation_to_return_to == nullptr
+        if(animation->mole_id == mole_id && animation->animation_type == AnimationCategory::Timer){
             animation->current_hp = new_hp;
+            
+            // for safety
+            delete animation->animation_to_return_to; 
+            animation->animation_to_return_to = nullptr; 
 
-            AnimationObject* animation_to_return_to = new AnimationObject(); 
-            *animation_to_return_to = *animation;
+            // copy contents of timer animation 
+            // to the future timer animation, which will be 
+            // eventually added back to linked list
+            AnimationObject* return_to_timer_animation = new AnimationObject(); 
+            *return_to_timer_animation = *animation; 
 
             render_colour_to_led(animation, Colour::Black); // may be redundant, as the new queued animation will change leds to blue
             delete animation;
             animation_list.erase(i);
 
-            queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, 200, 0, 0, animation_to_return_to, Colour::Blue);
+            // queue the new flash animation
+            queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, 200, 0, 0, return_to_timer_animation, Colour::Blue);
 
         }
 
@@ -101,7 +114,8 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
 } 
 
 
-// process_timed_animations()
+// Function modifies the led buffer based on system time
+// and the animation_List end_time
 void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
 
     for (int i = animation_list.size() - 1; i >= 0 ; i--){
@@ -114,11 +128,17 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
             // also check if there is animation to return to, if yes, push_back to list
             render_colour_to_led(animation, Colour::Black);
 
+
+            // If animation->animation_to_return_to != nullptr, we push it back into the list.
+            // Important: delete animation only deletes the AnimationObject itself.
+            // It does NOT delete animation->animation_to_return_to.
+            // Ownership of that pointer now belongs to the animation list.
+
             if(animation->animation_to_return_to != nullptr){
                 animation_list.push_back(animation->animation_to_return_to);
-            }
+            }  
 
-            delete animation;
+            delete animation; 
             animation_list.erase(i);
         }else{
             render_animation(animation, current_time_ms);
@@ -134,7 +154,6 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
 // Helper Functions
 // *************************************
 
-// queue_animation
 // Function adds an animation object to animation list
 void DisplayInterface::queue_animation(
     LedType led_type,
@@ -175,8 +194,7 @@ void DisplayInterface::queue_animation(
 
 }
 
-// remove_mole_animation
-// removes all ring and linear led animations for a mole
+// Function removes all ring and linear led animations for a mole
 void DisplayInterface::remove_mole_animation(int mole_id_) {
 
     for (int i = animation_list.size() - 1; i >= 0; i--) {
@@ -189,7 +207,7 @@ void DisplayInterface::remove_mole_animation(int mole_id_) {
     }
 }
 
-// remove_all_animation
+// Function removes all animations from animation_list
 void DisplayInterface::remove_all_animation() {
 
     for (int i = animation_list.size() - 1; i >= 0; i--) {
@@ -199,7 +217,8 @@ void DisplayInterface::remove_all_animation() {
     animation_list.clear();
 }
 
-// convert_to_crgb
+// Function converts user-enumerated Colour
+// to Fastled enumerated CRGB
 CRGB DisplayInterface::convert_to_crgb(Colour colour) {
     switch(colour) {
         case Colour::Green:  
@@ -223,30 +242,29 @@ CRGB DisplayInterface::convert_to_crgb(Colour colour) {
 // assumes rings, linears, then hearts are wired in series
 // eg. ring1, ..., ring9, linear1,..., linear9, heart1, heart2, heart3
 // mole ids vary from 1-9
-int DisplayInterface::convert_led_type_to_led_index(int mole_id, LedType led_type) {
+int DisplayInterface::convert_led_type_to_led_index(LedType led_type, int mole_id) {
 
     switch(led_type){
         case LedType::Ring:
             return (mole_id - 1) * leds_per_ring;
         case LedType::Linear:
             return (total_moles * leds_per_ring) + (mole_id - 1) * leds_per_linear;
+        case LedType::Heart:
+            return (total_moles * leds_per_ring) + (total_moles * leds_per_linear); 
+        default:
+            break;
     }
 
 }
 
-// for hearts
-int DisplayInterface::convert_led_type_to_led_index() {
-
-    return (total_moles * leds_per_ring) + (total_moles * leds_per_linear); 
-
-}
 
 
 // *************************************
 // Rendering Animations Helper Functions
 // *************************************
 
-// render_colour_to_led
+// Function renders a colour to an animation's 
+// type of led at a specific mole id
 void DisplayInterface::render_colour_to_led(AnimationObject* animation, Colour colour_){
 
     int leds_per_led_type;
@@ -263,7 +281,7 @@ void DisplayInterface::render_colour_to_led(AnimationObject* animation, Colour c
             break;
     }
 
-    int start_index = convert_led_type_to_led_index(animation->mole_id, animation->led_type);
+    int start_index = convert_led_type_to_led_index(animation->led_type, animation->mole_id);
     CRGB colour = convert_to_crgb(colour_);
 
     for (int i = start_index; i < start_index + leds_per_led_type; i++){
@@ -271,6 +289,8 @@ void DisplayInterface::render_colour_to_led(AnimationObject* animation, Colour c
     }
 }
 
+// Function is reponsible for processing the logic to advance
+// leds in the led buffer using animation_list
 void DisplayInterface::render_animation(AnimationObject* animation, unsigned long current_time_ms){
 
     //for round transition animations, we may queue one row 
@@ -324,7 +344,7 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
         // Number of LEDs to turn OFF (0 → leds_per_ring)
         int leds_to_turn_off = round(fraction_elapsed * leds_per_ring);
 
-        int start_led_index = convert_led_type_to_led_index(animation->mole_id, animation->led_type);
+        int start_led_index = convert_led_type_to_led_index(animation->led_type, animation->mole_id);
         int end_led_index  = start_led_index + leds_per_ring - 1;
 
         // Turn OFF LEDs starting from the LAST LED backward
@@ -337,7 +357,7 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
 
         if (animation->led_type == LedType::Linear) {
 
-            int start_led_index = convert_led_type_to_led_index(animation->mole_id, animation->led_type);
+            int start_led_index = convert_led_type_to_led_index(animation->led_type, animation->mole_id);
             Colour arr_of_colours[] = {
                 animation->colour_1,
                 animation->colour_2,
