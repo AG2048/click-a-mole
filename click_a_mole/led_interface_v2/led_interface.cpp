@@ -45,10 +45,6 @@ DisplayInterface::~DisplayInterface() {
     remove_all_animation(); 
 }
 
-
-
-
-
 // *************************************
 // Public Functions
 // *************************************
@@ -67,13 +63,45 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
     Colour c4 = (colour_count > 3 ? colours[3] : Colour::Black);
     Colour c5 = (colour_count > 4 ? colours[4] : Colour::Black);
 
-    queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, duration_ms);
-    queue_animation(LedType::Linear, AnimationCategory::Solid, mole_id, duration_ms, nullptr, c1, c2, c3, c4, c5);
+    queue_animation(LedType::Ring, AnimationCategory::Timer, mole_id, duration_ms, max_hp, max_hp);
+    queue_animation(LedType::Linear, AnimationCategory::Solid, mole_id, duration_ms, max_hp, max_hp, nullptr, c1, c2, c3, c4, c5);
 
 }
 
+void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
 
-// DOUBLE CHECK
+    // should show 300 ms intermediate flash for RING
+    // HP bar should just decrease
+
+    for (int i = animation_list.size() - 1; i >= 0 ; i--){
+
+        AnimationObject* animation = animation_list.get(i);
+
+        // hp bar
+        if(animation->mole_id == mole_id && animation->led_type == LedType::Linear){
+            animation->current_hp = new_hp;
+        }
+
+        if(animation->mole_id == mole_id && animation->led_type == LedType::Ring){
+            animation->current_hp = new_hp;
+
+            AnimationObject* animation_to_return_to = new AnimationObject(); 
+            *animation_to_return_to = *animation;
+
+            render_colour_to_led(animation, Colour::Black); // may be redundant, as the new queued animation will change leds to blue
+            delete animation;
+            animation_list.erase(i);
+
+            queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, 200, 0, 0, animation_to_return_to, Colour::Blue);
+
+        }
+
+    }
+
+} 
+
+
+// process_timed_animations()
 void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
 
     for (int i = animation_list.size() - 1; i >= 0 ; i--){
@@ -81,22 +109,25 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
         AnimationObject* animation = animation_list.get(i);
         // int ani_mole_id = animation->mole_id;
     
-        if (animation -> end_time_ms <= current_time_ms){ // check if animation is done
-            render_black_led(animation);
+        if (animation->end_time_ms <= current_time_ms){ // check if animation is done
+            
+            // also check if there is animation to return to, if yes, push_back to list
+            render_colour_to_led(animation, Colour::Black);
+
+            if(animation->animation_to_return_to != nullptr){
+                animation_list.push_back(animation->animation_to_return_to);
+            }
+
             delete animation;
             animation_list.erase(i);
-        } 
-
-        // render_animation(animation, current_time_ms);
+        }else{
+            render_animation(animation, current_time_ms);
+        }
     }
 
     FastLED.show();
 
 }
-
-
-
-
 
 
 // *************************************
@@ -110,7 +141,9 @@ void DisplayInterface::queue_animation(
     AnimationCategory animation_type,
     int mole_id,
     unsigned long duration_ms,
-    AnimationObject* animation_to_return_to,   
+    unsigned short current_hp,
+    unsigned short max_hp, 
+    AnimationObject* animation_to_return_to, 
     Colour colour_1,
     Colour colour_2,
     Colour colour_3,
@@ -128,6 +161,8 @@ void DisplayInterface::queue_animation(
     new_ani->start_time_ms = current_time_ms;
     new_ani->end_time_ms = current_time_ms + duration_ms;    
 
+    new_ani->current_hp = current_hp;
+    new_ani->max_hp = max_hp;
     new_ani->animation_to_return_to = animation_to_return_to;
     new_ani->colour_1 = colour_1;
     new_ani->colour_2 = colour_2;
@@ -147,7 +182,7 @@ void DisplayInterface::remove_mole_animation(int mole_id_) {
     for (int i = animation_list.size() - 1; i >= 0; i--) {
         AnimationObject* animation = animation_list.get(i);
         if (animation->mole_id == mole_id_) {
-            render_black_led(animation);
+            render_colour_to_led(animation, Colour::Black);
             delete animation;
             animation_list.erase(i);
         }
@@ -207,17 +242,12 @@ int DisplayInterface::convert_led_type_to_led_index() {
 }
 
 
-
-
-
-
-
 // *************************************
 // Rendering Animations Helper Functions
 // *************************************
 
-// render_black_led
-void DisplayInterface::render_black_led(AnimationObject* animation){
+// render_colour_to_led
+void DisplayInterface::render_colour_to_led(AnimationObject* animation, Colour colour_){
 
     int leds_per_led_type;
 
@@ -234,9 +264,106 @@ void DisplayInterface::render_black_led(AnimationObject* animation){
     }
 
     int start_index = convert_led_type_to_led_index(animation->mole_id, animation->led_type);
+    CRGB colour = convert_to_crgb(colour_);
 
     for (int i = start_index; i < start_index + leds_per_led_type; i++){
-        leds[i] = CRGB::Black;
+        leds[i] = colour;
+    }
+}
+
+void DisplayInterface::render_animation(AnimationObject* animation, unsigned long current_time_ms){
+
+    //for round transition animations, we may queue one row 
+    //pattern to occur after the next; in doing so, some animations' start time
+    //will be in the future
+    if(animation->start_time_ms > current_time_ms){
+        return;
+    }
+
+    AnimationCategory animation_type = animation->animation_type;
+
+    if(animation_type == AnimationCategory::Timer){
+        // POSSIBLE ISSUES
+        // 1.   depending on how the leds are wired,
+        //      code must be modified so that each ring timer
+        //      unwinds in a CCW fashion
+        //      FOR NOW, go with random unwinding direction
+        //      and just set leds to Colour::Black as time goes on
+        //
+        // 2.   concern is that leds may turn off like 1 turns off, 
+        //      then 2 turn off, as processtimedanimations may have 
+        //      inconsistenecies during when it is called, as other 
+        //      background proccces may happen,
+
+
+        // FIRST, fill all leds to a certain colour to reflect hp stage 
+        double remaining_hp_fraction = static_cast<float>(animation->current_hp) / static_cast<float>(animation->max_hp);
+        int remaining_hp_percentage = round(remaining_hp_fraction * 100.0);
+
+        if(remaining_hp_percentage <= 100 && remaining_hp_percentage >= 70){
+            render_colour_to_led(animation, Colour::Green);
+        }else if(remaining_hp_percentage <= 69 && remaining_hp_percentage >= 30){
+            render_colour_to_led(animation, Colour::Orange);
+        }else if(remaining_hp_percentage <= 29 && remaining_hp_percentage >= 0){
+            render_colour_to_led(animation, Colour::Red);
+
+        }
+
+        // SECOND: linearly set fraction of ring LEDs to Black as time goes on
+        unsigned long timer_current_time = current_time_ms - animation->start_time_ms;
+        unsigned long timer_total_time = animation->end_time_ms - animation->start_time_ms;
+
+        // Clamp timer_current_time so no divide-by-zero
+        if (timer_current_time > timer_total_time) {
+            timer_current_time = timer_total_time;
+        }
+
+        // Fraction of time that has passed (0.0 → 1.0)
+        float fraction_elapsed = (float)timer_current_time / (float)timer_total_time;
+
+        // Number of LEDs to turn OFF (0 → leds_per_ring)
+        int leds_to_turn_off = round(fraction_elapsed * leds_per_ring);
+
+        int start_led_index = convert_led_type_to_led_index(animation->mole_id, animation->led_type);
+        int end_led_index  = start_led_index + leds_per_ring - 1;
+
+        // Turn OFF LEDs starting from the LAST LED backward
+        for (int i = 0; i < leds_to_turn_off; i++) {
+            int led_index = end_led_index - i;
+            leds[led_index] = CRGB::Black;
+        }
+
+    }else if(animation_type == AnimationCategory::Solid){
+
+        if (animation->led_type == LedType::Linear) {
+
+            int start_led_index = convert_led_type_to_led_index(animation->mole_id, animation->led_type);
+            Colour arr_of_colours[] = {
+                animation->colour_1,
+                animation->colour_2,
+                animation->colour_3,
+                animation->colour_4,
+                animation->colour_5
+            };
+
+            int hp = animation->current_hp;
+            int maxhp = animation->max_hp;
+
+            // 1. Draw LEDs for remaining HP
+            for (int i = 0; i < hp; i++) {
+                leds[start_led_index + i] = convert_to_crgb(arr_of_colours[i]);
+            }
+
+            // 2. Turn off LEDs for lost HP
+            for (int i = hp; i < maxhp; i++) {
+                leds[start_led_index + i] = CRGB::Black;
+            }
+        }else if(animation->led_type == LedType::Ring){
+            render_colour_to_led(animation, animation->colour_1);
+        }
+
+    }else if(animation_type == AnimationCategory::Blinking){
+    }else if(animation_type == AnimationCategory::Wave){
     }
 }
 

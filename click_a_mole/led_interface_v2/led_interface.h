@@ -3,6 +3,7 @@
 
 #include "linked_list.h"
 #include "FastLED.h"
+#include <math.h>
 
 
 enum class Colour {
@@ -17,7 +18,8 @@ enum class Colour {
 enum class AnimationCategory {
     Solid,
     Blinking,
-    Wave
+    Wave,
+    Timer
 };
 
 enum class LedType {
@@ -34,6 +36,8 @@ struct AnimationObject{
     int mole_id; 
     unsigned long start_time_ms;
     unsigned long end_time_ms; //calculated from the current time (determined using millis() at start of function call) + duration 
+    unsigned short current_hp;
+    unsigned short max_hp;
     AnimationObject* animation_to_return_to;    
     Colour colour_1; 
     Colour colour_2; 
@@ -108,6 +112,8 @@ class DisplayInterface {
             AnimationCategory animation_type,
             int mole_id,
             unsigned long duration_ms,
+            unsigned short current_hp = 0,
+            unsigned short max_hp = 0,
             AnimationObject* animation_to_return_to = nullptr,
             Colour colour_1 = Colour::Black,
             Colour colour_2 = Colour::Black,
@@ -122,7 +128,8 @@ class DisplayInterface {
         int convert_led_type_to_led_index(); 
 
         //internal helper functions for rendering animations
-        void render_black_led(AnimationObject* animation_);
+        void render_colour_to_led(AnimationObject* animation_, Colour colour); //CHANGE
+        void render_animation(AnimationObject* animation_, unsigned long current_time_ms);
 
 
 
