@@ -125,7 +125,6 @@ class DisplayInterface {
         void remove_all_animation();
         CRGB convert_to_crgb(Colour colour);
         int convert_led_type_to_led_index(LedType led_type, int mole_id = -1);
-        int convert_led_type_to_led_index(); 
 
         //internal helper functions for rendering animations
         void render_colour_to_led(AnimationObject* animation_, Colour colour); //CHANGE
