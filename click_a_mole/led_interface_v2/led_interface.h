@@ -99,6 +99,7 @@ class DisplayInterface {
         unsigned short number_of_leds;
         unsigned short rings_data_pin;
         unsigned short hearts_data_pin;
+        unsigned short total_moles = 9;
         CRGB* leds;
 
         //internal helper functions
@@ -114,9 +115,11 @@ class DisplayInterface {
             Colour colour_4 = Colour::Black,
             Colour colour_5 = Colour::Black
         );
-        void remove_mole_animation(int mole_id_, LedType led_type_);
+        void remove_mole_animation(int mole_id_);
         void remove_all_animation();
         CRGB convert_to_crgb(Colour colour);
+        int convert_led_type_to_led_index(int mole_id, LedType led_type);
+        int convert_led_type_to_led_index(); 
 
         //internal helper functions for rendering animations
         void render_black_led(AnimationObject* animation_);
