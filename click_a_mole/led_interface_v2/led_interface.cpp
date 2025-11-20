@@ -144,6 +144,55 @@ void DisplayInterface::win_round(){
 
 }
 
+void DisplayInterface::end_mole(int mole_id, bool is_timeout, bool is_hp_zero){
+    
+    remove_mole_animation(mole_id);
+
+    if (is_timeout){
+        queue_animation(LedType::Ring, AnimationCategory::Blinking, mole_id, 200, Colour::Red);
+        queue_animation(LedType::Linear, AnimationCategory::Blinking, mole_id, 200);
+    } else if (is_hp_zero){
+        queue_animation(LedType::Ring, AnimationCategory::Blinking, mole_id, 200, Colour::Green);
+        queue_animation(LedType::Linear, AnimationCategory::Blinking, mole_id, 200);
+    }
+}
+
+void DisplayInterface::lose_round(){
+    for(int i = 1; i <= total_moles; i++){
+        remove_mole_animation(i);
+    }
+
+    AnimationObject* firstRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 1, 667, -1, -1, nullptr, Colour::Green);
+    queue_animation(LedType::Ring, AnimationCategory::Solid, 2, 667, -1, -1, nullptr, Colour::Red);
+    queue_animation(LedType::Ring, AnimationCategory::Solid, 3, 667, -1, -1, nullptr, Colour::Red);
+    queue_animation(LedType::Ring, AnimationCategory::Solid, 4, 667, -1, -1, nullptr, Colour::Red);
+
+    AnimationObject* secondRow = queue_future_animation(LedType::Ring, AnimationCategory::Solid, 5, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
+    queue_future_animation(LedType::Ring, AnimationCategory::Solid, 6, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+    queue_future_animation(LedType::Ring, AnimationCategory::Solid, 7, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+
+    queue_future_animation(LedType::Ring, AnimationCategory::Solid, 8, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+    queue_future_animation(LedType::Ring, AnimationCategory::Solid, 9, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+
+}
+
+void DisplayInterface::update_heart(int lives){
+    int heartIndex = convert_led_type_to_led_index(LedType::Heart, -1);
+    int heartOnLeds = lives * leds_per_heart;
+
+    // Turn heart leds on
+    for (int i = heartIndex; i < heartIndex + heartOnLeds; i++){
+        leds[i] = CRGB::Red;
+    }
+
+    // Turn off excess heart leds
+    for (int i = heartIndex + heartOnLeds; i < heartIndex + (3 * leds_per_heart); i++){
+        leds[i] = CRGB::Black;
+    }
+
+    FastLED.show();
+
+}
 
 // Function modifies the led buffer based on system time
 void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
