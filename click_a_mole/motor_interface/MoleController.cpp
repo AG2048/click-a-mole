@@ -51,7 +51,7 @@ void MoleController::addModule(MoleModule* mole) {
 
 void MoleController::updateAll() {
     for (MoleModule* x : moles) {
-        x->update();
+        x->update(&mux);
     }
 }
 
