@@ -98,8 +98,7 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
 // immediately returns to timer animation after flash animation is done
 // NOTE: The timer doesn't pause during flash animation
 void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
-
-    unsigned long start_time_ms = millis();
+    unsigned long current_time_ms = millis();
 
     // should show 200 ms intermediate flash for RING
     // HP bar should just decrease
@@ -107,18 +106,18 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
     for (int i = animation_list.size() - 1; i >= 0 ; i--){
 
         AnimationObject* animation = animation_list.get(i);
+    
 
-        // modify hp bar
+        // hp bar
         if(animation->mole_id == mole_id && animation->led_type == LedType::Linear){
             animation->current_hp = new_hp;
         }
 
-        // modify ring animation
-        // First, remove timer animation
-        // Second, queue flash animation
-        
+        // remove timer animation
+        // guarantees that animation->animation_to_return_to == nullptr
+
         // REVIEW LOGIC
-        if(animation->mole_id == mole_id && animation->animation_type == AnimationCategory::Timer){ // it is guaranteed that animation->animation_to_return_to == nullptr
+        if(animation->mole_id == mole_id && animation->animation_type == AnimationCategory::Timer){
             animation->current_hp = new_hp;
             
             // for safety
@@ -131,15 +130,42 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
             // Note: return_to_timer_animation preserves the start_time and end_time 
             AnimationObject* return_to_timer_animation = new AnimationObject(); 
             *return_to_timer_animation = *animation; 
-            
 
             render_colour_to_led(animation, Colour::Black); // may be redundant, as the new queued animation will change leds to blue
             delete animation;
             animation_list.erase(i);
 
             // queue the new flash animation
-            queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, start_time_ms, 200, 0, 0, return_to_timer_animation, Colour::Blue);
+            unsigned long current_time_ms = millis();
+            unsigned long time_till_timer_end_ms = return_to_timer_animation->end_time_ms - current_time_ms;
 
+            if (time_till_timer_end_ms < 200){
+                queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, current_time_ms, time_till_timer_end_ms, 0, 0, nullptr, Colour::Blue);
+                delete return_to_timer_animation; // no time left after flash, so delete queued timer animation
+            } else {
+                queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, current_time_ms, 200, 0, 0, return_to_timer_animation, Colour::Blue);
+            }
+
+            
+
+        }
+
+        // when the mole is hit during the flash
+        if(animation->mole_id == mole_id && animation->animation_type == AnimationCategory::Solid && animation->led_type == LedType::Ring && animation->animation_to_return_to != nullptr){
+
+            // Update HP in the original timer animation
+            animation->animation_to_return_to->current_hp = new_hp;
+    
+            // Restart flash
+            if (animation->end_time_ms + 200 < animation->animation_to_return_to->end_time_ms){
+                animation->end_time_ms += 200;
+            } else { // cap flash at end time and remove animation to return to
+                animation->end_time_ms = animation->animation_to_return_to->end_time_ms;
+                
+                delete animation->animation_to_return_to;
+                animation->animation_to_return_to = nullptr;
+            }
+            
         }
 
     }
@@ -170,7 +196,6 @@ void DisplayInterface::end_mole(int mole_id, bool is_timeout, bool is_hp_zero){
         queue_animation(LedType::Linear, AnimationCategory::Blinking, mole_id, start_time_ms, 200, -1, -1, nullptr, Colour::Green);
     }
 }
-
 
 // Function removes all mole animations
 // and plays round win animation for 2001m (divisble by 3), then sets all mole leds to black
