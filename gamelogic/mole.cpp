@@ -53,7 +53,7 @@ void Mole::handleDeath(GameLogic &game)
 {
     // function takes game object as a parameter by reference so it can increment score
     // expected output: mole goes back down (isAlive = false) and player's score increments by 1
-    HP = game.getInitialHP();
+
     // set mole's HP to initial HP
     setPosition(false, game.getDisplayInterface());
     // set mole position to down
