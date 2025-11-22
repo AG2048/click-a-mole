@@ -9,7 +9,9 @@ ISR(TIMER1_COMPA_vect) { // 100us
 MoleController::MoleController() { }
 
 MoleController::~MoleController() {
-
+    for (MoleModule* x : moles) {
+        delete x;
+    }
 }
 
 void MoleController::init() {
@@ -38,25 +40,33 @@ void MoleController::init() {
     // Enable interrupts globally
     sei();
 
-    // TODO: Initialize bi-mux I2C
+    Wire.begin();
+    mux.begin(Wire);
+    mux.closeAll();
 }
 
 void MoleController::addModule(MoleModule* mole) {
-
+    moles.push_back(mole);
 }
 
 void MoleController::updateAll() {
-
+    for (MoleModule* x : moles) {
+        x->update();
+    }
 }
 
 void MoleController::readButtons(int* arr) {
-
+    for (int i = 0; i < moles.size(); i++) {
+        arr[i] = moles[i]->readButton();
+    }
 }
 
 void MoleController::setHp(int index, int currHp, int maxHp) {
-
+    moles[index]->setAngle(currHp, maxHp);
 }
 
 void MoleController::resetHp() {
-
+    for (MoleModule* x : moles) {
+        x->setAngle(0, 1);
+    }
 }
