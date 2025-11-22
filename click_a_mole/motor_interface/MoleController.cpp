@@ -6,12 +6,16 @@ ISR(TIMER1_COMPA_vect) { // 100us
     }
 }
 
-MoleController::MoleController() { }
+MoleController::MoleController() {
+    moleCount = 0;
+    moles = nullptr;
+}
 
 MoleController::~MoleController() {
     for (MoleModule* x : moles) {
         delete x;
     }
+    delete[] moles;
 }
 
 void MoleController::init() {
@@ -40,13 +44,26 @@ void MoleController::init() {
     // Enable interrupts globally
     sei();
 
+    // TODO: Check if timer is same as millis timer
+
     Wire.begin();
     mux.begin(Wire);
     mux.closeAll();
 }
 
 void MoleController::addModule(MoleModule* mole) {
-    moles.push_back(mole);
+    MoleModule** newMoles = new MoleModule*[moleCount + 1];
+
+    for (int i = 0; i < moleCount; i++) {
+        newMoles[i] = moles[i];
+    }
+
+    delete[] moles;
+
+    moles = newMoles;
+    moles[moleCount] = mole;
+    
+    moleCount++;
 }
 
 void MoleController::updateAll() {
@@ -56,7 +73,7 @@ void MoleController::updateAll() {
 }
 
 void MoleController::readButtons(int* arr) {
-    for (int i = 0; i < moles.size(); i++) {
+    for (int i = 0; i < moleCount; i++) {
         arr[i] = moles[i]->readButton();
     }
 }

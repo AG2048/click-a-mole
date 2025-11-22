@@ -35,7 +35,9 @@ class MoleController {
         
     private:
         TCA9548A mux;
-        vector<MoleModule*> moles;
+        MoleModule** moles;
+
+        int moleCount;
 }
 
 #endif // MOLE_CONTROLLER_H
