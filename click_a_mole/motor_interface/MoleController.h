@@ -1,26 +1,38 @@
 #ifndef MOLE_CONTROLLER_H
 #define MOLE_CONTROLLER_H
 
+#include "MoleModule.h"
+
 class MoleController {
     public:
         MoleController();
 
+        // Free MoleModule instances in moles vector
         ~MoleController();
 
+        /* 
+        * Initialize timer interrupt
+        * Initialize bi-mux I2C
+        */
         void init();
 
-        void addMole(Mole* mole);
+        // Mallocs an instance of MoleModule, add to moles vector
+        void addModule(MoleModule* mole);
 
+        // Call update() on all MoleModules in moles vector
         void updateAll();
 
-        void updateMole(int index);
+        // Returns array of button states from all MoleModules
+        void readButtons(int* arr);
 
-        void setHealth(int index, int curr_hp, int max_hp);
+        // Call setHp() on MoleModule at index of moles vector
+        void setHp(int index, int currHp, int maxHp);
 
-        void resetAll();
+        // Call setHp() on all MoleModules and set to zero
+        void resetHp();
         
     private:
-        vector<Mole*> moles;
+        vector<MoleModule*> moles;
 }
 
 #endif // MOLE_CONTROLLER_H
