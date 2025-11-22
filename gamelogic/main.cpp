@@ -90,7 +90,6 @@ int main()
     // move to GameLogic
     const int initialLives = 3; // set to 3 but can update as difficulty increases
 
-    const int initialHP = 2;    // initial player lives
     int maxNumMolesUp = 2;      // maximum number of moles that can be up at once (adjust with difficulty level)
     int numMolesThisRound = 10; // total number of moles that will come up in a round
 
@@ -103,7 +102,7 @@ int main()
     DisplayInterface *p_di = new DisplayInterface;
     MotorInterface *m_di = new MotorInterface;
     {
-        GameLogic game(p_di, m_di, maxNumMolesUp, initialLives, initialHP); // create GameLogic object
+        GameLogic game(p_di, m_di, maxNumMolesUp, initialLives); // create GameLogic object
         // NOTE: We are creating the GameLogic object within a scope to ensure proper destruction at the end of the game.
 
         while (!game.gameEnded())
