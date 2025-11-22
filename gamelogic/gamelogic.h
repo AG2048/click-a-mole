@@ -11,7 +11,6 @@ private:
                                  // memory that hasn't been allocated yet
     int score;                   // player's score
     int lives;                   // player's lives
-    int initialHP;               // initial HP for moles at start of game
     int roundMaxMoles;           // maximum number of moles that can be up in a round
     unsigned long roundDuration; // duration for each round
     bool isGameEnded;            // status to check if game has ended
@@ -32,7 +31,6 @@ public:
     DisplayInterface *getDisplayInterface() const;                                                             // get pointer to DisplayInterface                                             // get pointer to MotorInterface
     char getInput();
     void setMaxMolesPerRound(int numMolesThisRound); // get user input
-    int getInitialHP();
 
     void game_loop_fsm(); // main game loop finite state machine
 };
