@@ -52,6 +52,9 @@ void MoleController::init() {
 }
 
 void MoleController::addModule(MoleModule* mole) {
+    // TODO: Check if loop works expected
+    // TODO: Better way to allocate mole
+
     MoleModule** newMoles = new MoleModule*[moleCount + 1];
 
     for (int i = 0; i < moleCount; i++) {
