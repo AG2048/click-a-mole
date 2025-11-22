@@ -111,20 +111,6 @@ class DisplayInterface {
             LedType led_type,
             AnimationCategory animation_type,
             int mole_id,
-            unsigned long duration_ms,
-            unsigned short current_hp = 0,
-            unsigned short max_hp = 0,
-            AnimationObject* animation_to_return_to = nullptr,
-            Colour colour_1 = Colour::Black,
-            Colour colour_2 = Colour::Black,
-            Colour colour_3 = Colour::Black,
-            Colour colour_4 = Colour::Black,
-            Colour colour_5 = Colour::Black
-        );
-        AnimationObject* queue_future_animation(
-            LedType led_type,
-            AnimationCategory animation_type,
-            int mole_id,
             unsigned long start_time_ms,
             unsigned long duration_ms,
             unsigned short current_hp,
@@ -151,3 +137,4 @@ class DisplayInterface {
 };
 
 #endif 
+
