@@ -95,7 +95,7 @@ void GameLogic::handleGameEnd()
 
     cout << "Game over! Player's lives have reached 0." << endl;
 }
-GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi, int maxNumMoles, int initialLives, int initialHP)
+GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi, int maxNumMoles, int initialLives)
 {
     // make sure to free any existing memory before allocating new memory for moleArr
     if (moleArr != nullptr)
@@ -116,7 +116,6 @@ GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi, int maxNumMol
     for (int i = 0; i < 9; i++)
     {
         moleArr[i] = new Mole(i);             // dynamically allocating each Mole object
-        moleArr[i]->setHP(initialHP);         // setting default HP for each mole
         moleArr[i]->setPosition(false, p_di); // setting all moles to down position initially
     }
     score = 0;            // initializing score to 0
@@ -126,7 +125,6 @@ GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi, int maxNumMol
     this->p_mi = p_mi;
     roundMaxMoles = maxNumMoles;
     isGameEnded = false;
-    this->initialHP = initialHP;
 }
 
 DisplayInterface *GameLogic::getDisplayInterface() const
@@ -175,9 +173,4 @@ void GameLogic::setMaxMolesPerRound(int maxMoles)
     // expected output: maximum number of moles per round is set to the new value
     roundMaxMoles = maxMoles;
     cout << "Maximum number of moles per round set to " << roundMaxMoles << endl;
-}
-
-int GameLogic::getInitialHP()
-{
-    return initialHP;
 }
