@@ -6,10 +6,16 @@ ISR(TIMER1_COMPA_vect) { // 100us
     }
 }
 
-MoleController::MoleController() { }
+MoleController::MoleController() {
+    moleCount = 0;
+    moles = nullptr;
+}
 
 MoleController::~MoleController() {
-
+    for (MoleModule* x : moles) {
+        delete x;
+    }
+    delete[] moles;
 }
 
 void MoleController::init() {
@@ -38,25 +44,49 @@ void MoleController::init() {
     // Enable interrupts globally
     sei();
 
-    // TODO: Initialize bi-mux I2C
+    // TODO: Check if timer is same as millis timer
+
+    Wire.begin();
+    mux.begin(Wire);
+    mux.closeAll();
 }
 
 void MoleController::addModule(MoleModule* mole) {
+    // TODO: Check if loop works expected
+    // TODO: Better way to allocate mole
 
+    MoleModule** newMoles = new MoleModule*[moleCount + 1];
+
+    for (int i = 0; i < moleCount; i++) {
+        newMoles[i] = moles[i];
+    }
+
+    delete[] moles;
+
+    moles = newMoles;
+    moles[moleCount] = mole;
+    
+    moleCount++;
 }
 
 void MoleController::updateAll() {
-
+    for (MoleModule* x : moles) {
+        x->update(&mux);
+    }
 }
 
 void MoleController::readButtons(int* arr) {
-
+    for (int i = 0; i < moleCount; i++) {
+        arr[i] = moles[i]->readButton();
+    }
 }
 
 void MoleController::setHp(int index, int currHp, int maxHp) {
-
+    moles[index]->setAngle(currHp, maxHp);
 }
 
 void MoleController::resetHp() {
-
+    for (MoleModule* x : moles) {
+        x->setAngle(0, 1);
+    }
 }

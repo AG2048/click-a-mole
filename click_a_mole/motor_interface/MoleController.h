@@ -1,6 +1,8 @@
 #ifndef MOLE_CONTROLLER_H
 #define MOLE_CONTROLLER_H
 
+#include <Wire.h>
+#include <TCA9548A.h>
 #include "MoleModule.h"
 
 class MoleController {
@@ -32,7 +34,10 @@ class MoleController {
         void resetHp();
         
     private:
-        vector<MoleModule*> moles;
+        TCA9548A mux;
+        MoleModule** moles;
+
+        int moleCount;
 }
 
 #endif // MOLE_CONTROLLER_H
