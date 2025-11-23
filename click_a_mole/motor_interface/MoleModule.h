@@ -1,6 +1,11 @@
 #ifndef MOLE_MODULE_H
 #define MOLE_MODULE_H
 
+#include "AS5600.h"
+#include <Wire.h>
+#include <TCA9548A.h>
+#include <Arduino.h>
+
 struct pin_t {
     uint8_t id;
     volatile uint8_t* port;
@@ -16,7 +21,7 @@ class MoleModule {
         * Read encoder angle (I2C), update currAngle
         * Update motor params (motorDir, motorSteps) based on target vs current angle
         */
-        void update();
+        void update(TCA9548A& mux);
 
         /* 
         * Returns the if button pressed since last read
@@ -41,14 +46,26 @@ class MoleModule {
         pin_t dirPin;
         uint8_t buttonPin;
         uint8_t sensorID; // Not the I2C addr, for the bi-mux
-
-        volatile uint8_t motorDir = 0;
-        volatile uint32_t motorSteps = 0;
         
         int targetAngle = 0;
         int currAngle = 0;
 
-        int buttonPressed = 0;
+        // button
+        int buttonPressed = 0; 
+        int lastButtonState = HIGH;   
+        unsigned long lastDebounceTime = 0;  // last time button state changed
+        unsigned long debounceDelay = 50;  
+
+        // motor
+        volatile uint8_t motorDir = 0;
+        volatile uint32_t motorSteps = 0;
+    
+        float threshold = 10.0;  // switch to slow speed
+        float positionTolerance = 2.0;   
+        
+        // uint32_t fastStepDelay = 500;    // ms between fast steps ??
+        // uint32_t slowStepDelay = 2000;   // ms between slow steps ??
+        // uint32_t currentStepDelay = fastStepDelay;
 }
 
 #endif // MOLE_MODULE_H
