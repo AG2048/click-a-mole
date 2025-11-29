@@ -1,9 +1,9 @@
 #ifndef MOLE_CONTROLLER_H
 #define MOLE_CONTROLLER_H
 
-#include <Wire.h>
-#include <TCA9548A.h>
 #include "MoleModule.h"
+
+#define T1_CMPA 800
 
 class MoleController {
     public:
@@ -32,12 +32,15 @@ class MoleController {
 
         // Call setHp() on all MoleModules and set to zero
         void resetHp();
+
+        // Called in ISR
+        static void stepAll();
         
     private:
         TCA9548A mux;
-        MoleModule** moles;
 
-        int moleCount;
-}
+        static MoleModule** moles;
+        static int moleCount;
+};
 
 #endif // MOLE_CONTROLLER_H

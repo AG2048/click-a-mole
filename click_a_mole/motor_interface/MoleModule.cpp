@@ -3,6 +3,9 @@
 MoleModule::MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t sensorID) 
     : pulPin(pulPin), dirPin(dirPin), buttonPin(buttonPin), sensorID(sensorID) {
 
+    pinMode(pulPin.id, OUTPUT);
+    pinMode(dirPin.id, OUTPUT);
+
     // Read initial state of the button
     pinMode(buttonPin, INPUT_PULLUP);
     lastButtonState = digitalRead(buttonPin);  
@@ -79,7 +82,7 @@ int MoleModule::readButton() {
 }
 
 void MoleModule::setAngle(int currHp, int maxHp) {
-    targetAngle = ((double)currHp / maxHp) * 360; // example function
+    targetAngle = (currHp / maxHp) * 360; // example function
 }
 
 void MoleModule::stepUpdate() {

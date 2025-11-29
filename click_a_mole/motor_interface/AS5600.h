@@ -24,6 +24,6 @@ class AS5600 {
 
         // Read encoder value (0-4095)
         int readEncoder();
-}
+};
 
 #endif // AS5600_H

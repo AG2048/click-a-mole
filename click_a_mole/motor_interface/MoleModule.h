@@ -1,10 +1,12 @@
 #ifndef MOLE_MODULE_H
 #define MOLE_MODULE_H
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/atomic.h>
 #include "AS5600.h"
 #include <Wire.h>
 #include <TCA9548A.h>
-#include <Arduino.h>
 
 struct pin_t {
     uint8_t id;
@@ -39,7 +41,6 @@ class MoleModule {
         void stepUpdate();
 
     private:
-        TB6600 motor;
         AS5600 sensor;
 
         pin_t pulPin;
@@ -66,6 +67,6 @@ class MoleModule {
         // uint32_t fastStepDelay = 500;    // ms between fast steps ??
         // uint32_t slowStepDelay = 2000;   // ms between slow steps ??
         // uint32_t currentStepDelay = fastStepDelay;
-}
+};
 
 #endif // MOLE_MODULE_H

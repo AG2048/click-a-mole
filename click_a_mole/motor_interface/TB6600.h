@@ -38,6 +38,6 @@ class TB6600 {
         uint8_t _stepPin;
         uint8_t _dirPin;
         uint8_t _enaPin;
-}
+};
 
 #endif // TB6600_H

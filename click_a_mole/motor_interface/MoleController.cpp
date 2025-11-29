@@ -1,19 +1,20 @@
 #include "MoleController.h"
 
+MoleModule** MoleController::moles = nullptr;
+int MoleController::moleCount = 0;
+
 ISR(TIMER1_COMPA_vect) { // 100us
-    for (MoleModule* x : MoleController::moles) {
-        x->stepUpdate();
-    }
+    MoleController::stepAll();
 }
 
 MoleController::MoleController() {
-    moleCount = 0;
-    moles = nullptr;
+
 }
 
 MoleController::~MoleController() {
-    for (MoleModule* x : moles) {
-        delete x;
+    cli(); // Disable interrupts during destructor
+    for (int i = 0; i < moleCount; i++) {
+        delete moles[i];
     }
     delete[] moles;
 }
@@ -44,16 +45,14 @@ void MoleController::init() {
     // Enable interrupts globally
     sei();
 
-    // TODO: Check if timer is same as millis timer
-
     Wire.begin();
     mux.begin(Wire);
     mux.closeAll();
 }
 
+// IMPORTANT: Must be called before .init()
 void MoleController::addModule(MoleModule* mole) {
-    // TODO: Check if loop works expected
-    // TODO: Better way to allocate mole
+    cli();
 
     MoleModule** newMoles = new MoleModule*[moleCount + 1];
 
@@ -67,11 +66,13 @@ void MoleController::addModule(MoleModule* mole) {
     moles[moleCount] = mole;
     
     moleCount++;
+
+    sei();
 }
 
 void MoleController::updateAll() {
-    for (MoleModule* x : moles) {
-        x->update(&mux);
+    for (int i = 0; i < moleCount; i++) {
+        moles[i]->update(&mux);
     }
 }
 
@@ -86,7 +87,13 @@ void MoleController::setHp(int index, int currHp, int maxHp) {
 }
 
 void MoleController::resetHp() {
-    for (MoleModule* x : moles) {
-        x->setAngle(0, 1);
+    for (int i = 0; i < moleCount; i++) {
+        moles[i]->setAngle(0, 1);
+    }
+}
+
+void MoleController::stepAll() {
+    for (int i = 0; i < moleCount; i++) {
+        moles[i]->stepUpdate();
     }
 }
