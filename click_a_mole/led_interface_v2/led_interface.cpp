@@ -307,10 +307,6 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
 }
 
 
-
-
-
-
 // *************************************
 // Helper Functions
 // *************************************
@@ -555,6 +551,35 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
         }
 
     }else if(animation_type == AnimationCategory::Blinking){
+        // flash interval CONSTANT (100ms)
+        const int FLASH_INTERVAL_MS = 100;
+
+        if (animation->led_type == LedType::Ring) {
+            unsigned long time_elapsed = current_time_ms - animation->start_time_ms;
+
+            unsigned long cycle_position = time_elapsed / FLASH_INTERVAL_MS;
+
+            bool is_on_cycle = (cycle_position % 2 == 0);
+
+            if (is_on_cycle) {
+                render_colour_to_led(animation, animation->colour_1);
+            } else {
+                render_colour_to_led(animation, Colour::Black);
+            }
+
+        } else if (animation->led_type == LedType::Linear){
+            unsigned long time_elapsed = current_time_ms - animation->start_time_ms;
+
+            unsigned long cycle_position = time_elapsed / FLASH_INTERVAL_MS;
+
+            bool is_on_cycle = (cycle_position % 2 == 0);
+
+            if (is_on_cycle) {
+                render_colour_to_led(animation, animation->colour_1);
+            } else {
+                render_colour_to_led(animation, Colour::Black);
+            }
+        } // else just in case
     }else if(animation_type == AnimationCategory::Wave){
     }
 }
