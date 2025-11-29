@@ -42,7 +42,7 @@ void MoleModule::update(TCA9548A& mux) {
     // find shortest path
     if (error > 180.0) {
         error -= 360.0;
-    } else if (error < 180.0) {
+    } else if (error < -180.0) {
         error += 360.0;
     }
 
@@ -58,7 +58,7 @@ void MoleModule::update(TCA9548A& mux) {
 
     // calculate steps
     const float stepsPerDegree = (3200/1.8);
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {uint32_t motorSteps = (uint32_t)(fabs(error) * stepsPerDegree);}
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {motorSteps = (uint32_t)(fabs(error) * stepsPerDegree);}
 
     // // adjust speed ???
     // if (fabs(error) > threshold) {
@@ -79,7 +79,7 @@ int MoleModule::readButton() {
 }
 
 void MoleModule::setAngle(int currHp, int maxHp) {
-    targetAngle = (currHp / maxHp) * 360; // example function
+    targetAngle = ((double)currHp / maxHp) * 360; // example function
 }
 
 void MoleModule::stepUpdate() {
