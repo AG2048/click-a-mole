@@ -66,8 +66,6 @@ void MoleController::addModule(MoleModule* mole) {
     moles[moleCount] = mole;
     
     moleCount++;
-
-    sei();
 }
 
 void MoleController::updateAll() {
