@@ -54,15 +54,16 @@ class MoleModule {
         // button
         int buttonPressed = 0; 
         int lastButtonState = HIGH;   
+        int stableButtonState = HIGH;
         unsigned long lastDebounceTime = 0;  // last time button state changed
-        unsigned long debounceDelay = 50;  
+        unsigned long debounceDelay = 10;  
 
         // motor
         volatile uint8_t motorDir = 0;
         volatile uint32_t motorSteps = 0;
     
         float threshold = 10.0;  // switch to slow speed
-        float positionTolerance = 2.0;   
+        float positionTolerance = 10.0;   
         
         // uint32_t fastStepDelay = 500;    // ms between fast steps ??
         // uint32_t slowStepDelay = 2000;   // ms between slow steps ??
