@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "name": "Arduino",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "${env:USERPROFILE}/AppData/Local/Arduino15/packages/**/hardware/**/cores/arduino",
+        "${env:USERPROFILE}/AppData/Local/Arduino15/packages/**/hardware/**/variants/**",
+        "C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino",
+        "C:/Program Files (x86)/Arduino/hardware/arduino/avr/variants/mega",
+        "D:/Users/User/AppData/Local/Programs/Arduino IDE/resources/app/hardware/arduino/avr/cores/arduino",
+        "D:/Users/User/AppData/Local/Programs/Arduino IDE/resources/app/hardware/arduino/avr/variants/mega"
+      ],
+      "defines": [
+        "ARDUINO=10805",
+        "__AVR_ATmega2560__"
+      ],
+      "compilerPath": "D:\\Users\\gaozi\\AppData\\Local\\Programs\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-gcc-x64"
+    }
+  ],
+  "version": 4
+}

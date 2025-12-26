@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Arduino: Compile (mega)",
+      "type": "shell",
+      "command": "D:\\Users\\gaozi\\AppData\\Local\\Programs\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe",
+      "args": ["compile", "--fqbn", "arduino:avr:mega", "motor_interface"],
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Arduino: Upload (COM3)",
+      "type": "shell",
+      "command": "D:\\Users\\gaozi\\AppData\\Local\\Programs\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe",
+      "args": ["upload", "-p", "COM3", "--fqbn", "arduino:avr:mega", "motor_interface"],
+      "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Arduino: Verify & Upload (prompt port)",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "D:\\Users\\gaozi\\AppData\\Local\\Programs\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe compile --fqbn arduino:avr:mega motor_interface && D:\\Users\\gaozi\\AppData\\Local\\Programs\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe upload -p ${input:serialPort} --fqbn arduino:avr:mega motor_interface"],
+      "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "serialPort",
+      "type": "promptString",
+      "description": "Enter serial port (e.g. COM3)"
+    }
+    ,
+    {
+      "id": "arduinoCliPath",
+      "type": "promptString",
+      "description": "Path to arduino-cli executable or 'arduino-cli' if it's on PATH",
+      "default": "D:\\Users\\gaozi\\AppData\\Local\\Programs\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe"
+    }
+  ]
+}
