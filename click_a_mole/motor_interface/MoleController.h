@@ -4,6 +4,7 @@
 #include "MoleModule.h"
 
 #define T1_CMPA 800
+#define TCA9548A_ADDRESS 0x70
 
 class MoleController {
     public:

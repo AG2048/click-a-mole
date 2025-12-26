@@ -3,7 +3,7 @@
 MoleModule** MoleController::moles = nullptr;
 int MoleController::moleCount = 0;
 
-ISR(TIMER1_COMPA_vect) { // 100us
+ISR(TIMER1_COMPA_vect) { // slow 5ms, fast 100us
     MoleController::stepAll();
 }
 
@@ -17,9 +17,16 @@ MoleController::~MoleController() {
         delete moles[i];
     }
     delete[] moles;
+    sei();
 }
 
 void MoleController::init() {
+    // Wire.begin();
+    mux.begin(Wire);
+    mux.closeAll();
+
+    cli();
+
     // Clear config A reg
     TCCR1A = 0;
 
@@ -44,13 +51,10 @@ void MoleController::init() {
 
     // Enable interrupts globally
     sei();
-
-    Wire.begin();
-    mux.begin(Wire);
-    mux.closeAll();
 }
 
 // IMPORTANT: Must be called before .init()
+// Fix this to allocate x2 instead of +1 each time
 void MoleController::addModule(MoleModule* mole) {
     cli();
 
@@ -72,7 +76,7 @@ void MoleController::addModule(MoleModule* mole) {
 
 void MoleController::updateAll() {
     for (int i = 0; i < moleCount; i++) {
-        moles[i]->update(&mux);
+        moles[i]->update(mux);
     }
 }
 

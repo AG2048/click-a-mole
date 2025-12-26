@@ -12,14 +12,8 @@ MoleModule::MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t se
 }
 
 void MoleModule::update(TCA9548A& mux) {
-    // Get encoder angle value I2C  
-    mux.openChannel(sensorID);
-    delayMicroseconds(10);  
-    // Update currAngle
-    currAngle = sensor.readAngle();
-    mux.closeChannel(sensorID);
-
-
+    // ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {motorSteps = 3200;}
+    
     // Get current button state
     int currentButtonState = digitalRead(buttonPin);
     
@@ -30,15 +24,32 @@ void MoleModule::update(TCA9548A& mux) {
     }
 
     if ((millis() - lastDebounceTime) > debounceDelay) {
-        if (currentButtonState == LOW && lastButtonState == HIGH) {
-            buttonPressed = 1;
+        if (currentButtonState != stableButtonState) {
+            stableButtonState = currentButtonState;
+            
+            if (stableButtonState == HIGH) {
+                buttonPressed = 1;
+            }
         }
     }
 
     lastButtonState = currentButtonState;
 
-
     
+    // Get encoder angle value I2C  
+    // Serial.println("ID " + String(sensorID));
+    // Wire.beginTransmission(0x70);
+    // Wire.write(0x00);
+    // Wire.endTransmission(true);
+    mux.openChannel(sensorID);
+    // delayMicroseconds(10);  
+    // Update currAngle
+    currAngle = sensor.readAngle();
+    mux.closeChannel(sensorID);
+    Serial.print("Angle: ");
+    Serial.println(currAngle);
+
+
     // Compute motor dir and motor steps from curr and target angle
     float error = targetAngle - currAngle;
 
@@ -61,7 +72,12 @@ void MoleModule::update(TCA9548A& mux) {
 
     // calculate steps
     const float stepsPerDegree = (3200/1.8);
+    // uint32_t stepsToMove = min(40, (uint32_t)(fabs(error) * stepsPerDegree))
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {motorSteps = (uint32_t)(fabs(error) * stepsPerDegree);}
+
+    // return;
+
+    
 
     // // adjust speed ???
     // if (fabs(error) > threshold) {
