@@ -1,4 +1,5 @@
 #include "MoleModule.h"
+#define TOTAL_DEGREES_PER_ROLL 360.0
 
 MoleModule::MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t sensorID) 
     : pulPin(pulPin), dirPin(dirPin), buttonPin(buttonPin), sensorID(sensorID) {
@@ -9,6 +10,10 @@ MoleModule::MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t se
     // Read initial state of the button
     pinMode(buttonPin, INPUT_PULLUP);
     lastButtonState = digitalRead(buttonPin);  
+
+    this->minVelocity = 5;
+    this->maxVelocity = 1;
+
 }
 
 void MoleModule::update(TCA9548A& mux) {
@@ -53,13 +58,6 @@ void MoleModule::update(TCA9548A& mux) {
     // Compute motor dir and motor steps from curr and target angle
     float error = targetAngle - currAngle;
 
-    // find shortest path
-    if (error > 180.0) {
-        error -= 360.0;
-    } else if (error < -180.0) {
-        error += 360.0;
-    }
-
     // check if close to target, if close, then done
     if (fabs(error) <= positionTolerance) {
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {motorSteps = 0;}
@@ -76,17 +74,9 @@ void MoleModule::update(TCA9548A& mux) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {motorSteps = (uint32_t)(fabs(error) * stepsPerDegree);}
 
     // return;
-
-    
-
-    // // adjust speed ???
-    // if (fabs(error) > threshold) {
-    //     currentStepDelay = fastStepDelay;
-    // } else {
-    //     currentStepDelay = slowStepDelay;
-    // }
+    // calculate dstVelocity
+    dstVelocity = minVelocity + (maxVelocity - minVelocity) / TOTAL_DEGREES_PER_ROLL * error;
 }
-
 
 int MoleModule::readButton() {
     if (buttonPressed) { // RS latch for 'button pressed'
@@ -98,18 +88,25 @@ int MoleModule::readButton() {
 }
 
 void MoleModule::setAngle(int currHp, int maxHp) {
-    targetAngle = (currHp / maxHp) * 360; // example function
+    targetAngle = (currHp / maxHp) * TOTAL_DEGREES_PER_ROLL; // example function
 }
 
 void MoleModule::stepUpdate() {
-    if (motorDir) {
+    if (motorDir) 
+    {
         *(dirPin.port) |= dirPin.bitmask;
     } else {
         *(dirPin.port) &= ~(dirPin.bitmask);
     }
 
-    if (motorSteps > 0) {
-        *(pulPin.port) ^= pulPin.bitmask;
-        motorSteps--;
+    if (motorSteps > 0){
+        velocityCounter++;
+        if (velocityCounter >= dstVelocity) 
+        { 
+            velocityCounter = 0;
+
+            *(pulPin.port) ^= pulPin.bitmask;
+            motorSteps--;
+        } 
     }
 }

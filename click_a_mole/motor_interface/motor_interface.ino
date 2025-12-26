@@ -7,11 +7,10 @@ MoleController controller;
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Setup delay");
-  Serial.println("Setup delay");
 
+  Serial.println("Setup delay");
   Serial.println("Setup addModule");
-  Serial.println("Setup addModule");
+
   controller.addModule(
     new MoleModule(
       {22, &PORTA, (1 << PA0)},   // pul
@@ -29,36 +28,19 @@ void setup() {
   // //     1                           // mux channel
   // //   )
   // // );
+
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.println("Setup init");
   // delay(500);
-  // // controller.addModule(
-  // //   new MoleModule(
-  // //     {24, &PORTA, (1 << PA2)},   // pul
-  // //     {25, &PORTA, (1 << PA3)},   // dir
-  // //     31,                         // button
-  // //     1                           // mux channel
-  // //   )
-  // // );
-  pinMode(LED_BUILTIN, OUTPUT);
-  Serial.println("Setup init");
-  // delay(500);
+
   controller.init();
-  Serial.println("Setup complete");
   Serial.println("Setup complete");
 }
 
 int hp[2] = {5, 5};
 int buttons[2];
 int i = 0;
-int hp[2] = {5, 5};
-int buttons[2];
-int i = 0;
 void loop() {
-  Serial.println("-----");
-  Serial.print("Loop: ");
-  Serial.println(i++);
-
   Serial.println("-----");
   Serial.print("Loop: ");
   Serial.println(i++);

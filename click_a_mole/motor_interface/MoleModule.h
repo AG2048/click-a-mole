@@ -39,6 +39,9 @@ class MoleModule {
         * Based on (motorDir, motorSteps), update motor control pin registers
         */
         void stepUpdate();
+        void setMinVelocity(int minV){ minVelocity = minV; }
+        void setMaxVelocity(int maxV){ maxVelocity = maxV; if (maxVelocity < 1) maxVelocity = 1; }
+
 
     private:
         AS5600 sensor;
@@ -47,6 +50,11 @@ class MoleModule {
         pin_t dirPin;
         uint8_t buttonPin;
         uint8_t sensorID; // Not the I2C addr, for the bi-mux
+
+        int dstVelocity = 1;
+        int velocityCounter = 0;
+        int minVelocity = 5;
+        int maxVelocity = 1;
         
         int targetAngle = 0;
         int currAngle = 0;
