@@ -67,6 +67,7 @@ int AnimationList::size() {
 }
 
 //complete
+//deletes nodes; doesn't delete the AnimationObject*
 void AnimationList::clear() {
     Node* p = head;
 

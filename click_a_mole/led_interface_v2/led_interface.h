@@ -12,7 +12,9 @@ enum class Colour {
     Yellow,
     Red,
     Blue,
-    Black
+    Black,
+    HealerMole, 
+    NormalMole 
 };
 
 enum class AnimationCategory {
@@ -25,6 +27,7 @@ enum class AnimationCategory {
 enum class LedType {
     Ring,
     Linear,
+    Indicator,
     Heart
 };
 
@@ -39,11 +42,7 @@ struct AnimationObject{
     unsigned short current_hp;
     unsigned short max_hp;
     AnimationObject* animation_to_return_to;    
-    Colour colour_1; 
-    Colour colour_2; 
-    Colour colour_3;  
-    Colour colour_4;  
-    Colour colour_5;  
+    Colour colour; //used to indicate type of mole  
 };
 
 
@@ -53,6 +52,7 @@ class DisplayInterface {
         DisplayInterface(
             unsigned short leds_per_ring, 
             unsigned short leds_per_linear, 
+            unsigned short leds_per_mole_indicator,
             unsigned short leds_per_heart, 
             unsigned short number_of_leds,
             unsigned short rings_data_pin,
@@ -78,7 +78,7 @@ class DisplayInterface {
         void game_over(); 
 
         // ring timer + mole hp bar helper functions
-        void start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour colours[], int colour_count); 
+        void start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour mole_type); 
         void change_mole_hp(int mole_id, int new_hp, int max_hp); 
         void end_mole(int mole_id, bool is_timeout, bool is_hp_zero); 
 
@@ -99,11 +99,13 @@ class DisplayInterface {
         AnimationList animation_list; //Linked List
         unsigned short leds_per_ring; 
         unsigned short leds_per_linear; 
+        unsigned short leds_per_mole_indicator;
         unsigned short leds_per_heart;
         unsigned short number_of_leds;
         unsigned short rings_data_pin;
         unsigned short hearts_data_pin;
         unsigned short total_moles = 9;
+        unsigned short total_lives = 3;
         CRGB* leds;
 
         //internal helper functions
@@ -116,11 +118,7 @@ class DisplayInterface {
             unsigned short current_hp,
             unsigned short max_hp, 
             AnimationObject* animation_to_return_to = nullptr,
-            Colour colour_1 = Colour::Black,
-            Colour colour_2 = Colour::Black,
-            Colour colour_3 = Colour::Black,
-            Colour colour_4 = Colour::Black,
-            Colour colour_5 = Colour::Black
+            Colour colour = Colour::Black
         );
         void remove_mole_animation(int mole_id_);
         void remove_all_animation();

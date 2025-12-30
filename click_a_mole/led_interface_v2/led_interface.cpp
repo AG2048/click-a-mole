@@ -8,6 +8,7 @@
 DisplayInterface::DisplayInterface(
     unsigned short leds_per_ring_, 
     unsigned short leds_per_linear_, 
+    unsigned short leds_per_mole_indicator_,
     unsigned short leds_per_heart_, 
     unsigned short number_of_leds_,
     unsigned short rings_data_pin_,
@@ -17,6 +18,7 @@ DisplayInterface::DisplayInterface(
     // Initialize any other setup here if needed
     this->leds_per_ring = leds_per_ring_;
     this->leds_per_linear = leds_per_linear_;
+    this->leds_per_mole_indicator = leds_per_mole_indicator_;
     this->leds_per_heart = leds_per_heart_;
     this->number_of_leds = number_of_leds_;
     this->rings_data_pin = rings_data_pin_;
@@ -74,7 +76,7 @@ REVIEW LOGIC
 */
 
 // Function starts the ring timer and hp bar for each mole
-void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour colours[], int colour_count) { // vector bc for one round it may be 3 lives or 5 lives so theats like 3 vs 5 colors, its green by default but if they do pass smth then itll be what they pass
+void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour colour) { // vector bc for one round it may be 3 lives or 5 lives so theats like 3 vs 5 colors, its green by default but if they do pass smth then itll be what they pass
 
     unsigned long start_time_ms = millis();
 
@@ -82,14 +84,9 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
     // which inludes any rings and linear LEDs
     remove_mole_animation(mole_id);
 
-    Colour c1 = (colour_count > 0 ? colours[0] : Colour::Black);
-    Colour c2 = (colour_count > 1 ? colours[1] : Colour::Black);
-    Colour c3 = (colour_count > 2 ? colours[2] : Colour::Black);
-    Colour c4 = (colour_count > 3 ? colours[3] : Colour::Black);
-    Colour c5 = (colour_count > 4 ? colours[4] : Colour::Black);
-
     queue_animation(LedType::Ring, AnimationCategory::Timer, mole_id, start_time_ms, duration_ms, max_hp, max_hp);
     queue_animation(LedType::Linear, AnimationCategory::Solid, mole_id, start_time_ms, duration_ms, max_hp, max_hp, nullptr, c1, c2, c3, c4, c5);
+    queue_animation(LedType::Indicator, AnimationCategory::Solid, mole_id, start_time_ms, )
 
 }
 
@@ -249,15 +246,15 @@ void DisplayInterface::lose_round(){
 // player has on the heart led display
 void DisplayInterface::update_heart(int lives){
     int heartIndex = convert_led_type_to_led_index(LedType::Heart, -1);
-    int heartOnLeds = lives * leds_per_heart; //number of leds to turn on
+    int num_heart_leds_on = lives * leds_per_heart; //number of leds to turn on
 
     // Turn heart leds on
-    for (int i = heartIndex; i < heartIndex + heartOnLeds; i++){
+    for (int i = heartIndex; i < heartIndex + num_heart_leds_on; i++){
         leds[i] = CRGB::Red;
     }
 
     // Turn off excess heart leds
-    for (int i = heartIndex + heartOnLeds; i < heartIndex + (3 * leds_per_heart); i++){
+    for (int i = heartIndex + num_heart_leds_on; i < heartIndex + (total_lives * leds_per_heart); i++){
         leds[i] = CRGB::Black;
     }
 
@@ -353,7 +350,7 @@ AnimationObject* DisplayInterface::queue_animation(
 
 }
 
-// Function removes all ring and linear led animations for a mole
+// Function removes all ring, linear and mole_indicator led animations for a mole
 void DisplayInterface::remove_mole_animation(int mole_id_) {
 
     for (int i = animation_list.size() - 1; i >= 0; i--) {
@@ -399,6 +396,10 @@ CRGB DisplayInterface::convert_to_crgb(Colour colour) {
             return CRGB::Blue;
         case Colour::Black:  
             return CRGB::Black;
+        case Colour::HealerMole:
+            return CRGB::Blue;
+        case Colour::NormalMole:
+            return CRGB::Green;
         default:             
             return CRGB::Black;
     }
@@ -415,9 +416,11 @@ int DisplayInterface::convert_led_type_to_led_index(LedType led_type, int mole_i
         case LedType::Ring:
             return (mole_id - 1) * leds_per_ring;
         case LedType::Linear:
-            return (total_moles * leds_per_ring) + (mole_id - 1) * leds_per_linear;
+            return (total_moles * leds_per_ring) + (mole_id - 1) * leds_per_linear; 
+        case LedType::Indicator:
+            return (total_moles * leds_per_ring) + (total_moles * leds_per_linear) + (mole_id - 1) * leds_per_mole_indicator;
         case LedType::Heart:
-            return (total_moles * leds_per_ring) + (total_moles * leds_per_linear); 
+            return (total_moles * leds_per_ring) + (total_moles * leds_per_linear) + (total_moles * leds_per_mole_indicator); 
         default:
             return -1;
     }
@@ -443,6 +446,9 @@ void DisplayInterface::render_colour_to_led(AnimationObject* animation, Colour c
             break;
         case LedType::Linear:
             leds_per_led_type = leds_per_linear;
+            break;
+        case LedType::Indicator:
+            leds_per_led_type = leds_per_mole_indicator;
             break;
         case LedType::Heart:
             leds_per_led_type = leds_per_heart;
@@ -486,7 +492,7 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
 
         // FIRST, fill all leds to a certain colour to reflect hp stage 
         double remaining_hp_fraction = static_cast<float>(animation->current_hp) / static_cast<float>(animation->max_hp);
-        int remaining_hp_percentage = round(remaining_hp_fraction * 100.0);
+        int remaining_hp_percentage = floor(remaining_hp_fraction * 100.0); 
 
         if(remaining_hp_percentage <= 100 && remaining_hp_percentage >= 70){
             render_colour_to_led(animation, Colour::Green);
@@ -510,7 +516,7 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
         float fraction_elapsed = (float)timer_current_time / (float)timer_total_time;
 
         // Number of LEDs to turn OFF (0 → leds_per_ring)
-        int leds_to_turn_off = round(fraction_elapsed * leds_per_ring);
+        int leds_to_turn_off = floor(fraction_elapsed * leds_per_ring);
 
         int start_led_index = convert_led_type_to_led_index(animation->led_type, animation->mole_id);
         int end_led_index  = start_led_index + leds_per_ring - 1;
@@ -547,6 +553,8 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
                 leds[start_led_index + i] = CRGB::Black;
             }
         }else if(animation->led_type == LedType::Ring){
+            render_colour_to_led(animation, animation->colour_1);
+        }else if(animation->led_type == LedType::Indicator){
             render_colour_to_led(animation, animation->colour_1);
         }
 
