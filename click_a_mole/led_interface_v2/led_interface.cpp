@@ -47,34 +47,6 @@ DisplayInterface::~DisplayInterface() {
     remove_all_animation(); 
 }
 
-
-
-
-
-
-// *************************************
-// Public Functions
-// *************************************
-
-/*
-NOTES
-1.  refactor queue_animation so that it is the exact same as queue_future_animation
-    ideally the start_time_ms can be set outside of the function
-
-2.  should we have an explicit function to run FastLED.show() or just include it in 
-    process_timed_animations
-
-3.  go over REVIEW LOGIC comments
-
-
-
-change_mole_hp
-change_colour_mode
-REVIEW LOGIC
-
-
-*/
-
 // Function starts the ring timer and hp bar for each mole
 void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour colour) { // vector bc for one round it may be 3 lives or 5 lives so theats like 3 vs 5 colors, its green by default but if they do pass smth then itll be what they pass
 
@@ -85,8 +57,8 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
     remove_mole_animation(mole_id);
 
     queue_animation(LedType::Ring, AnimationCategory::Timer, mole_id, start_time_ms, duration_ms, max_hp, max_hp);
-    queue_animation(LedType::Linear, AnimationCategory::Solid, mole_id, start_time_ms, duration_ms, max_hp, max_hp, nullptr, c1, c2, c3, c4, c5);
-    queue_animation(LedType::Indicator, AnimationCategory::Solid, mole_id, start_time_ms, )
+    queue_animation(LedType::Linear, AnimationCategory::Solid, mole_id, start_time_ms, duration_ms, max_hp, max_hp);
+    queue_animation(LedType::Indicator, AnimationCategory::Solid, mole_id, start_time_ms, duration_ms, max_hp, max_hp, nullptr, colour);
 
 }
 
@@ -137,10 +109,10 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
             unsigned long time_till_timer_end_ms = return_to_timer_animation->end_time_ms - current_time_ms;
 
             if (time_till_timer_end_ms < 200){
-                queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, current_time_ms, time_till_timer_end_ms, 0, 0, nullptr, Colour::Blue);
+                queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, current_time_ms, time_till_timer_end_ms, -1, -1);
                 delete return_to_timer_animation; // no time left after flash, so delete queued timer animation
             } else {
-                queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, current_time_ms, 200, 0, 0, return_to_timer_animation, Colour::Blue);
+                queue_animation(LedType::Ring, AnimationCategory::Solid, mole_id, current_time_ms, 200, -1, -1, return_to_timer_animation, Colour::Blue);
             }
 
             
@@ -151,7 +123,7 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
         if(animation->mole_id == mole_id && animation->animation_type == AnimationCategory::Solid && animation->led_type == LedType::Ring && animation->animation_to_return_to != nullptr){
 
             // Update HP in the original timer animation
-            animation->animation_to_return_to->current_hp = new_hp;
+            animation->animation_to_return_to->current_hp = new_hp; //what if hit during the else block 
     
             // Restart flash
             if (animation->end_time_ms + 200 < animation->animation_to_return_to->end_time_ms){
@@ -303,6 +275,79 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
 
 }
 
+void DisplayInterface::win_game(){
+    unsigned long start_time_ms = millis();
+
+    for(int i = 1; i <= total_moles; i++){
+        remove_mole_animation(i);
+    }
+
+    // Animation goes in a circle 3 times 1->2->3->4->5->9->8->7->6 
+    // could loop through an array with the proper mole ids
+    int path[] = {1, 2, 3, 4, 5, 9, 8, 7, 6};
+
+    int start_delay = 0;
+
+    for (int i = 0 i < 3; i++){
+        for (int j = 1; j <= total_moles; j++){
+            int id = path[j];
+            queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + start_delay, 350, -1, -1, nullptr, Colour::Green);
+            start_delay += 350;
+
+        }
+
+    }
+
+    // Hold green animation for a duration of time
+    for (int id = 1; id <= total_moles; id++){
+        queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + start_delay, 2000, -1, -1, nullptr, Colour::Green);
+    }
+
+}
+
+void DisplayInterface::lose_game(){
+    // Light whole thing, then only bottom two row, then last row only
+    unsigned long start_time_ms = millis();
+
+    for(int i = 1; i <= total_moles; i++){
+        remove_mole_animation(i);
+    }
+
+    unsigned long flash_duration = 600;
+    unsigned long gap_duration = 300;
+    unsigned long total_offset = flash_duration + gap_duration;
+
+    // All
+    for (int id = 1; id <= total_moles; id++){
+        queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms, flash_duration, -1, -1, nullptr, Colour::Red);
+    }
+
+    // Second and last row, may need to extend start time so itll be a flash and turn black for a few seconds
+    for (int id = 5; id <= total_moles; id++){
+        queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + total_offset, flash_duration, -1, -1, nullptr, Colour::Red);
+    }
+
+    total_offset += flash_duration + gap_duration;
+
+    // Last row
+    for (int id = 8; id <= total_moles; id++){
+        queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + total_offset, flash_duration, -1, -1, nullptr, Colour::Red);
+    }
+    
+}
+
+void DisplayInterface::idle_state(){
+    remove_all_animation();
+
+    CRGB idle_yellow = convert_to_crgb(Colour::dim_yellow);
+
+    for(int i = 0; i < number_of_leds; i++){
+        leds[i] = idle_yellow;
+    }
+
+    fastLED.show();
+}
+
 
 // *************************************
 // Helper Functions
@@ -317,11 +362,7 @@ AnimationObject* DisplayInterface::queue_animation(
     unsigned short current_hp,
     unsigned short max_hp, 
     AnimationObject* animation_to_return_to, 
-    Colour colour_1,
-    Colour colour_2,
-    Colour colour_3,
-    Colour colour_4,
-    Colour colour_5
+    Colour colour_
 ){
     // Store the time when animation functions were called
     // and create new animation object
@@ -337,11 +378,7 @@ AnimationObject* DisplayInterface::queue_animation(
     new_ani->current_hp = current_hp;
     new_ani->max_hp = max_hp;
     new_ani->animation_to_return_to = animation_to_return_to;
-    new_ani->colour_1 = colour_1;
-    new_ani->colour_2 = colour_2;
-    new_ani->colour_3 = colour_3;
-    new_ani->colour_4 = colour_4;
-    new_ani->colour_5 = colour_5;
+    new_ani->colour = colour_;
 
     // Add new animation object to animation list
     animation_list.push_back(new_ani);
@@ -426,7 +463,6 @@ int DisplayInterface::convert_led_type_to_led_index(LedType led_type, int mole_i
     }
 
 }
-
 
 
 
@@ -533,11 +569,11 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
 
             int start_led_index = convert_led_type_to_led_index(animation->led_type, animation->mole_id);
             Colour arr_of_colours[] = {
-                animation->colour_1,
-                animation->colour_2,
-                animation->colour_3,
-                animation->colour_4,
-                animation->colour_5
+                animation->colour,
+                animation->colour,
+                animation->colour,
+                animation->colour,
+                animation->colour
             };
 
             int hp = animation->current_hp;
@@ -553,9 +589,9 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
                 leds[start_led_index + i] = CRGB::Black;
             }
         }else if(animation->led_type == LedType::Ring){
-            render_colour_to_led(animation, animation->colour_1);
+            render_colour_to_led(animation, animation->colour);
         }else if(animation->led_type == LedType::Indicator){
-            render_colour_to_led(animation, animation->colour_1);
+            render_colour_to_led(animation, animation->colour);
         }
 
     }else if(animation_type == AnimationCategory::Blinking){
@@ -570,7 +606,7 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
             bool is_on_cycle = (cycle_position % 2 == 0);
 
             if (is_on_cycle) {
-                render_colour_to_led(animation, animation->colour_1);
+                render_colour_to_led(animation, animation->colour);
             } else {
                 render_colour_to_led(animation, Colour::Black);
             }
@@ -583,7 +619,7 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
             bool is_on_cycle = (cycle_position % 2 == 0);
 
             if (is_on_cycle) {
-                render_colour_to_led(animation, animation->colour_1);
+                render_colour_to_led(animation, animation->colour);
             } else {
                 render_colour_to_led(animation, Colour::Black);
             }
