@@ -14,7 +14,8 @@ enum class Colour {
     Blue,
     Black,
     HealerMole, 
-    NormalMole 
+    NormalMole,
+    Dim_Yellow
 };
 
 enum class AnimationCategory {
@@ -87,6 +88,11 @@ class DisplayInterface {
         void lose_round(); 
         void changeDuration(unsigned long newDuration_ms); 
         void changeDuration(int moleID, unsigned long newDuration_ms);
+
+        // game end helper functions
+        void win_game();
+        void lose_game();
+        void idle_state();
 
         // oled display + leaderboard helper functions
         void show_idle_oled_animation();

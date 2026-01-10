@@ -57,7 +57,7 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
     remove_mole_animation(mole_id);
 
     queue_animation(LedType::Ring, AnimationCategory::Timer, mole_id, start_time_ms, duration_ms, max_hp, max_hp);
-    queue_animation(LedType::Linear, AnimationCategory::Solid, mole_id, start_time_ms, duration_ms, max_hp, max_hp);
+    queue_animation(LedType::Linear, AnimationCategory::Solid, mole_id, start_time_ms, duration_ms, max_hp, max_hp, nullptr, Colour::Green);
     queue_animation(LedType::Indicator, AnimationCategory::Solid, mole_id, start_time_ms, duration_ms, max_hp, max_hp, nullptr, colour);
 
 }
@@ -284,15 +284,15 @@ void DisplayInterface::win_game(){
 
     // Animation goes in a circle 3 times 1->2->3->4->5->9->8->7->6 
     // could loop through an array with the proper mole ids
-    int path[] = {1, 2, 3, 4, 5, 9, 8, 7, 6};
+    int path[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     int start_delay = 0;
 
-    for (int i = 0 i < 3; i++){
-        for (int j = 1; j <= total_moles; j++){
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < total_moles; j++){
             int id = path[j];
-            queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + start_delay, 350, -1, -1, nullptr, Colour::Green);
-            start_delay += 350;
+            queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + start_delay, 100, -1, -1, nullptr, Colour::Green);
+            start_delay += 100;
 
         }
 
@@ -339,13 +339,13 @@ void DisplayInterface::lose_game(){
 void DisplayInterface::idle_state(){
     remove_all_animation();
 
-    CRGB idle_yellow = convert_to_crgb(Colour::dim_yellow);
+    CRGB idle_yellow = convert_to_crgb(Colour::Dim_Yellow);
 
     for(int i = 0; i < number_of_leds; i++){
         leds[i] = idle_yellow;
     }
 
-    fastLED.show();
+    FastLED.show();
 }
 
 
@@ -437,6 +437,8 @@ CRGB DisplayInterface::convert_to_crgb(Colour colour) {
             return CRGB::Blue;
         case Colour::NormalMole:
             return CRGB::Green;
+        case Colour::Dim_Yellow:
+            return CRGB(15, 15, 0);
         default:             
             return CRGB::Black;
     }
@@ -568,20 +570,13 @@ void DisplayInterface::render_animation(AnimationObject* animation, unsigned lon
         if (animation->led_type == LedType::Linear) {
 
             int start_led_index = convert_led_type_to_led_index(animation->led_type, animation->mole_id);
-            Colour arr_of_colours[] = {
-                animation->colour,
-                animation->colour,
-                animation->colour,
-                animation->colour,
-                animation->colour
-            };
 
             int hp = animation->current_hp;
             int maxhp = animation->max_hp;
 
             // 1. Draw LEDs for remaining HP
             for (int i = 0; i < hp; i++) {
-                leds[start_led_index + i] = convert_to_crgb(arr_of_colours[i]);
+                leds[start_led_index + i] = convert_to_crgb(animation->colour);
             }
 
             // 2. Turn off LEDs for lost HP
