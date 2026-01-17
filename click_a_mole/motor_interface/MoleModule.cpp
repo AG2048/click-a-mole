@@ -79,7 +79,7 @@ void MoleModule::update(TCA9548A& mux) {
 
     // return;
     // calculate dstVelocity
-    dstVelocity = minVelocity + (maxVelocity - minVelocity) / TOTAL_DEGREES_PER_ROLL * error;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { dstVelocity = minVelocity + (maxVelocity - minVelocity) / TOTAL_DEGREES_PER_ROLL * error; }
 }
 
 int MoleModule::readButton() {

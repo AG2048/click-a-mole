@@ -53,7 +53,7 @@ class MoleModule {
         uint8_t buttonPin;
         uint8_t sensorID; // Not the I2C addr, for the bi-mux
 
-        int dstVelocity = 1;
+        volatile int dstVelocity = 1;
         int velocityCounter = 0;
         int minVelocity = 5;
         int maxVelocity = 1;
