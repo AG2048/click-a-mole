@@ -11,6 +11,8 @@ void setup() {
   Serial.println("Setup delay");
   Serial.println("Setup addModule");
 
+  controller.init();
+
   controller.addModule(
     new MoleModule(
       {22, &PORTA, (1 << PA0)},   // pul
@@ -33,7 +35,7 @@ void setup() {
   Serial.println("Setup init");
   // delay(500);
 
-  controller.init();
+  controller.startTimer();
   Serial.println("Setup complete");
 }
 
@@ -64,5 +66,5 @@ void loop() {
   Serial.print(", ");
   Serial.println(hp[1]); 
 
-  delay(10);
+  delay(500);
 }

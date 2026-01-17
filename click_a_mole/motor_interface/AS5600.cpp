@@ -6,7 +6,7 @@ AS5600::AS5600() {
 
 // initializing AS5600
 void AS5600::init() {
-    Wire.begin();
+    // Wire.begin();
 
     // set read pointer in reg file
     Wire.beginTransmission(addr);

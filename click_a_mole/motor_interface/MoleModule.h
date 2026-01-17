@@ -18,6 +18,8 @@ class MoleModule {
     public:
         MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t sensorID);
 
+        void init();
+
         /* 
         * Read button state determine if button pressed since last read, update buttonPressed
         * Read encoder angle (I2C), update currAngle

@@ -16,6 +16,10 @@ MoleModule::MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t se
 
 }
 
+void MoleModule::init() {
+    sensor.init();
+}
+
 void MoleModule::update(TCA9548A& mux) {
     // ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {motorSteps = 3200;}
     

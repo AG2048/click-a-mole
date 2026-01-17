@@ -24,7 +24,9 @@ void MoleController::init() {
     // Wire.begin();
     mux.begin(Wire);
     mux.closeAll();
+}
 
+void MoleController::startTimer() {
     cli();
 
     // Clear config A reg
@@ -72,6 +74,8 @@ void MoleController::addModule(MoleModule* mole) {
     moleCount++;
 
     sei();
+
+    mole->init();
 }
 
 void MoleController::updateAll() {

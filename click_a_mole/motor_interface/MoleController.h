@@ -14,10 +14,13 @@ class MoleController {
         ~MoleController();
 
         /* 
-        * Initialize timer interrupt
+        * 
         * Initialize bi-mux I2C
         */
         void init();
+
+        //Initialize timer interrupt
+        void startTimer();
 
         // Mallocs an instance of MoleModule, add to moles vector
         void addModule(MoleModule* mole);
