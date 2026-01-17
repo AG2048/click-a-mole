@@ -4,6 +4,17 @@
 #include "linked_list.h"
 #include "FastLED.h"
 #include <math.h>
+#include "Adafruit_LEDBackpack.h"
+#include <Wire.h>
+
+//#include "Adafruit_GFX.h"  
+//#include "Adafruit_SSD1306.h"
+
+// Define constants for OLED
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define SCREEN_I2C_ADDRESS 0x3C
+#define OLED_RESET_PIN -1
 
 
 enum class Colour {
@@ -29,7 +40,8 @@ enum class LedType {
     Ring,
     Linear,
     Indicator,
-    Heart
+    Heart,
+    Hp
 };
 
 
@@ -76,7 +88,7 @@ class DisplayInterface {
         void show_score(int current_score); 
         void turn_off_score(); 
         void game_start(); 
-        void game_over(); 
+        void game_over(const String& result); 
 
         // ring timer + mole hp bar helper functions
         void start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour mole_type); 
@@ -110,9 +122,18 @@ class DisplayInterface {
         unsigned short number_of_leds;
         unsigned short rings_data_pin;
         unsigned short hearts_data_pin;
-        unsigned short total_moles = 9;
+        unsigned short total_moles = 1;
         unsigned short total_lives = 3;
         CRGB* leds;
+
+        // 7-Seg
+        Adafruit_7segment sevenSeg = Adafruit_7segment();
+        bool sevenSegReady = false;
+        uint8_t sevenSegAddr = 0x75; // default address?
+
+        // // OLED Display
+        // Adafruit_SSD1306 oled;
+        // bool oledReady = false;
 
         //internal helper functions
         AnimationObject* queue_animation(
@@ -134,6 +155,9 @@ class DisplayInterface {
         //internal helper functions for rendering animations
         void render_colour_to_led(AnimationObject* animation_, Colour colour); //CHANGE
         void render_animation(AnimationObject* animation_, unsigned long current_time_ms);
+        
+        // Seven Seg Helper Functions
+        void write4(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3);
 
 
 
