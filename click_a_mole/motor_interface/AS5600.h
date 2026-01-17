@@ -18,8 +18,8 @@ class AS5600 {
         void setZeroPos();
         
     private:
-        uint8_t addr = 0x36;
-        uint8_t angleReg = 0x0E;
+        int addr = 0x36;
+        int angleReg = 0x0E;
         float offset = 0.0;
 
         // Read encoder value (0-4095)
