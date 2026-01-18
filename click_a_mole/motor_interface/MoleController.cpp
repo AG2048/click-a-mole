@@ -24,6 +24,7 @@ void MoleController::init() {
     // Wire.begin();
     mux.begin(Wire);
     mux.closeAll();
+    Serial.println("MoleController init complete");
 }
 
 void MoleController::startTimer() {

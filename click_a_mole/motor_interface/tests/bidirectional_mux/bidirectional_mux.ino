@@ -6,7 +6,7 @@ TCA9548A mux;
 
 void setup() {
   Serial.begin(9600);
-  Wire.begin();
+  // Wire.begin();
   mux.begin(Wire);
   mux.closeAll();
 }

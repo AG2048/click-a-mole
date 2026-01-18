@@ -43,9 +43,11 @@ int hp[2] = {5, 5};
 int buttons[2];
 int i = 0;
 void loop() {
-  Serial.println("-----");
-  Serial.print("Loop: ");
-  Serial.println(i++);
+  if (i % 10 == 0) {
+    Serial.println("-----");
+    Serial.print("Loop: ");
+    Serial.println(i);
+  }
 
   controller.updateAll();
   controller.readButtons(buttons);
@@ -55,16 +57,21 @@ void loop() {
 
   controller.setHp(0, hp[0], 10);
   controller.setHp(1, hp[1], 10);
+  
+  if (i % 10 == 0) {
+    Serial.print((hp[0]/10)*360);
 
-  Serial.print("Buttons: ");
-  Serial.print(buttons[0]);
-  Serial.print(", ");
-  Serial.println(buttons[1]);
+    Serial.print("Buttons: ");
+    Serial.print(buttons[0]);
+    Serial.print(", ");
+    Serial.println(buttons[1]);
 
-  Serial.print("HP: ");
-  Serial.print(hp[0]);
-  Serial.print(", ");
-  Serial.println(hp[1]); 
+    Serial.print("HP: ");
+    Serial.print(hp[0]);
+    Serial.print(", ");
+    Serial.println(hp[1]); 
+  }
 
-  delay(500);
+  i++;
+  delay(50);
 }
