@@ -1,6 +1,7 @@
 #include "gamelogic.h"
 #include "led_interface.h"
 #include "motor_interface.h"
+#include <Arduino.h>
 
 DisplayInterface *p_di = nullptr;
 MotorInterface *p_mi = nullptr;

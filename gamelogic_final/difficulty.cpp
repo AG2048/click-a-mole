@@ -1,8 +1,7 @@
 #include "difficulty.h"
-#include <cmath>
-#include <cstdlib>
-using namespace std;
-
+#include <stdlib.h>
+#include <math.h>
+#include <Arduino.h>
 // Level 1: ~1000 ms, then decays toward 0 as level increases
 unsigned long minSpawnIntervalForLevel(int level)
 {
