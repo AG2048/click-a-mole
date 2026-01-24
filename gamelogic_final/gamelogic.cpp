@@ -381,11 +381,6 @@ void GameLogic::fsm()
         Serial.print("\n\n"
                      << endl);
         // delay to simulate display time
-
-        delete p_di;
-        p_di = NULL;
-        delete p_mi;
-        p_mi = NULL;
         nextGameState = S_IDLE;
     }
     else if (currentGameState == S_LEADERBOARD)
