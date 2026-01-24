@@ -1,7 +1,5 @@
 #include "gamelogic.h"
 #include "mole.h"
-#include "arduino.h"
-#include <iostream>
 #include "led_interface.h"
 
 void Mole::setLastDownTime(unsigned long time)
@@ -22,13 +20,21 @@ void Mole::setHP(int hp)
         HP = hp;
     else
         HP = maxHP;
-    // cout << "Mole " << ID << "'s HP set to " << HP << endl;
+    /* Serial.print("Mole");
+    Serial.print(ID);
+    Serial.print("Mole ");
+    Serial.print(ID);
+    Serial.print("'s HP set to ");
+    Serial.println(HP); */
 }
 
 int Mole::getHP() const
 {
     // expected output: returns the current HP of the mole
-    // cout << "Mole " << ID << "'s current HP is " << HP << endl;
+    // Serial.print("Mole");
+    // Serial.print(ID);
+    // Serial.print("'s current HP is ");
+    // Serial.println(HP);
     return HP;
 }
 
@@ -41,13 +47,19 @@ void Mole::setPosition(bool alive, DisplayInterface *p_di)
     // takes a boolean argument to set the position of the mole
     // expected output: if up is true, mole is set to up (visible); if false, mole is set to down (not visible)
     isAlive = alive;
-    // cout << "Mole " << ID << " position set to " << (isAlive ? "up" : "down") << endl;
+    // Serial.print("Mole ");
+    // Serial.print(ID);
+    // Serial.print(" position set to ");
+    // Serial.println(isAlive ? "up" : "down");
 }
 
 bool Mole::getPosition() const
 {
     // expected output: prints position and returns true if mole is up (visible), false if down (not visible)
-    // cout << "Mole " << ID << " position is " << (isAlive ? "up" : "down") << endl;
+    // Serial.print("Mole ");
+    // Serial.print(ID);
+    // Serial.print(" position is ");
+    // Serial.println(isAlive ? "up" : "down");
     return isAlive;
 }
 
@@ -60,15 +72,20 @@ void Mole::handleDeath(GameLogic *game)
     // set mole position to down
     game->setScore(game->getScore() + 1);
     // increment player's score by 1
-    game->getDisplayInterface()->endMole(ID, false, true); // notify display that mole ended due to HP reaching 0  
-    // cout << "Mole " << ID << " has died. Going back down and incrementing score." << endl;
+    game->getDisplayInterface()->endMole(ID, false, true); // notify display that mole ended due to HP reaching 0
+    // Serial.print("Mole ");
+    // Serial.print(ID);
+    // Serial.println(" has died. Going back down and incrementing score.");
     lastDownTime = millis();
 }
 
 bool Mole::getTimeIsUp() const
 {
     // expected output: prints timeIsUp status and returns true if time is up, false otherwise
-    // cout << "Mole " << ID << "'s timeIsUp status is " << (timeIsUp ? "true" : "false") << endl;
+    // Serial.print("Mole ");
+    // Serial.print(ID);
+    // Serial.print("'s timeIsUp status is ");
+    // Serial.println(timeIsUp ? "true" : "false");
     return timeIsUp;
 }
 
@@ -85,7 +102,9 @@ void Mole::handleTimeIsUp(GameLogic *game)
     game->getDisplayInterface()->endMole(ID, true, false); // notify display that mole ended due to timeout
     game->getDisplayInterface()->update_heart(game->getLives());
     timeIsUp = false;
-    // cout << "Mole " << ID << "'s time is up. Going back down and decrementing lives." << endl;
+    // Serial.print("Mole ");
+    // Serial.print(ID);
+    // Serial.println("'s time is up. Going back down and decrementing lives.");
     lastDownTime = millis();
 }
 
@@ -97,14 +116,19 @@ void Mole::decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di)
     // expected output: mole's HP decreases by the specified amount
     if (isAlive == false)
     {
-        // cout << "Mole " << ID << "is down. Cannot decrease HP." << endl;
+        // Serial.print("Mole ");
+        // Serial.print(ID);
+        // Serial.println("is down. Cannot decrease HP.");
         return;
     }
     HP -= delta_to_decrease_by;
     p_di->changeMoleHP(ID, HP, 3); // assuming max HP is 3
     if (HP < 0)
         HP = 0; // Ensure HP doesn't go negative
-    // cout << "Mole's HP decreased by " << delta_to_decrease_by << ". New HP is " << HP << endl;
+    // Serial.print("Mole's HP decreased by ");
+    // Serial.print(delta_to_decrease_by);
+    // Serial.print(". New HP is ");
+    // Serial.println(HP);
 }
 
 void Mole::setMaxHP(int max_hp)
@@ -119,14 +143,19 @@ void Mole::increaseHp(int delta_to_increase_by, DisplayInterface *p_di)
     // expected output: mole's HP increases by the specified amount
     if (isAlive == false)
     {
-        // cout << "Mole " << ID << "is down. Cannot increase HP." << endl;
+        // Serial.print("Mole ");
+        // Serial.print(ID);
+        // Serial.println("is down. Cannot increase HP.");
         return;
     }
     HP += delta_to_increase_by;
     p_di->changeMoleHP(ID, HP, 3); // assuming max HP is 3
     if (HP >= maxHP)
         HP = maxHP; // Ensure HP doesn't go over max
-    // cout << "Mole's HP increased by " << delta_to_increase_by << ". New HP is " << HP << endl;
+    // Serial.print("Mole's HP increased by ");
+    // Serial.print(delta_to_increase_by);
+    // Serial.print(". New HP is ");
+    // Serial.println(HP);
 }
 
 Mole::Mole(int ID)
@@ -169,7 +198,11 @@ void Mole::checkIfTimeIsUp()
     {
         timeIsUp = true;
     }
-    cout << "Current Time Elapsed for Mole " << ID << ": " << int(currenttime - startime) / 1000 << " s" << endl;
+    Serial.print("Current Time Elapsed for Mole ");
+    Serial.print(ID);
+    Serial.print(": ");
+    Serial.print(int(currenttime - startime)); // in milliseconds cause converstion to seconds is expensive
+    Serial.println("ms");
 }
 
 void Black::update(GameLogic *game)
