@@ -409,3 +409,36 @@ void GameLogic::fsm()
     }
     currentGameState = nextGameState;
 }
+char getInput()
+{
+
+    if (Serial.available() > 0)
+    {                         // if a key is pressed
+        return Serial.read(); // return that key
+    }
+    else
+    {
+        return '\0'; // default: no key pressed
+    }
+
+    /*
+    if (kbhit() > 0)
+    { // usually just written as `if( kbhit() )`
+        int input_int = getchar();
+        char input = (char)input_int;
+        if (input_int == EOF)
+        {
+            // Handle the EOF case, perhaps by returning a sentinel value
+            input = '\0'; // or some other appropriate value
+        }
+
+        inputs += input;
+        return input;
+    }
+    else
+    {
+        return '\0';
+    }
+
+    */
+}
