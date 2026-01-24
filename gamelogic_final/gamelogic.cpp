@@ -4,7 +4,7 @@
 #include "motor_interface.h"
 #include "difficulty.h"
 #include <Arduino.h>
-#include <stdlib.h>:
+#include <stdlib.h> // for rand() and srand()
 #define TOTAL_MOLES 9
 #define MAX_LIVES 3
 
