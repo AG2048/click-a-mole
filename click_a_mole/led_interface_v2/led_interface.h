@@ -74,6 +74,7 @@ class DisplayInterface {
         ); 
         ~DisplayInterface(); 
         void process_timed_animations(unsigned long current_time_ms);
+        void begin();
 
         // general helper functions
         void power_on_showcase(); 
