@@ -4,7 +4,7 @@
 #include "motor_interface.h"
 #include "difficulty.h"
 #include <Arduino.h>
-
+#include <stdlib.h>:
 #define TOTAL_MOLES 9
 #define MAX_LIVES 3
 
