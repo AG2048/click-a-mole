@@ -73,7 +73,7 @@ class MoleModule {
         volatile uint32_t motorSteps = 0;
     
         float threshold = 10.0;  // switch to slow speed
-        float positionTolerance = 10.0;   
+        float positionTolerance = 1.8;   
         
         // uint32_t fastStepDelay = 500;    // ms between fast steps ??
         // uint32_t slowStepDelay = 2000;   // ms between slow steps ??

@@ -62,6 +62,10 @@ void MoleModule::update(TCA9548A& mux) {
 
     // Compute motor dir and motor steps from curr and target angle
     float error = targetAngle - currAngle;
+    
+    // Correct error for wrap around
+    if (error > 180.0) error -= 360.0;
+    else if (error < -180.0) error += 360.0;
 
     // check if close to target, if close, then done
     if (fabs(error) <= positionTolerance) {
@@ -74,7 +78,7 @@ void MoleModule::update(TCA9548A& mux) {
     motorDir = (error > 0) ? 1 : 0;
 
     // calculate steps
-    const float stepsPerDegree = (3200/1.8);
+    const float stepsPerDegree = ((1600*2)/1.8);
     // uint32_t stepsToMove = min(40, (uint32_t)(fabs(error) * stepsPerDegree))
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {motorSteps = (uint32_t)(fabs(error) * stepsPerDegree);}
 
