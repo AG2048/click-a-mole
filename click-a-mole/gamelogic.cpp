@@ -8,81 +8,12 @@
 #define TOTAL_MOLES 9
 #define MAX_LIVES 3
 
-using namespace std;
-void delay(int milli_seconds)
-{
-
-    // Storing start time
-    clock_t start_time = clock();
-
-    // Convert milliseconds to clock ticks (CLOCKS_PER_SEC ticks per second)
-    clock_t wait_ticks = (clock_t)milli_seconds * (clock_t)CLOCKS_PER_SEC / 1000;
-
-    // looping till required time is not achieved
-    while (clock() < start_time + wait_ticks)
-        ;
-}
-
-void GameLogic::handleInput(char c)
-{
-    // process user input character (for testing we're using keyboard keys)
-    // will map corresponding keys to arduino pins
-    Serial.print("Handling input: ");
-    Serial.println(c);
-    // Add input handling logic here
-    switch (c)
-    {
-    case 'q':
-        Serial.println("Escape key pressed. Exiting game.");
-        break;
-    case '1':
-        moleArr[0]->decreaseHp(1, p_di);
-        Serial.println("Mole 0 hit!");
-        break;
-    case '2':
-        moleArr[1]->decreaseHp(1, p_di);
-        Serial.println("Mole 1 hit!");
-        break;
-    case '3':
-        moleArr[2]->decreaseHp(1, p_di);
-        Serial.println("Mole 2 hit!");
-        break;
-    case '4':
-        moleArr[3]->decreaseHp(1, p_di);
-        Serial.println("Mole 3 hit!");
-        break;
-    case '5':
-        moleArr[4]->decreaseHp(1, p_di);
-        Serial.println("Mole 4 hit!");
-        break;
-    case '6':
-        moleArr[5]->decreaseHp(1, p_di);
-        Serial.println("Mole 5 hit!");
-        break;
-    case '7':
-        moleArr[6]->decreaseHp(1, p_di);
-        Serial.println("Mole 6 hit!");
-        break;
-    case '8':
-        moleArr[7]->decreaseHp(1, p_di);
-        Serial.println("Mole 7 hit!");
-        break;
-    case '9':
-        moleArr[8]->decreaseHp(1, p_di);
-        Serial.println("Mole 8 hit!");
-        break;
-    default:
-        Serial.println("Unhandled key pressed: " + String(c));
-        break;
-    }
-}
-
 char getInput()
 {
 
-    if (_kbhit())
-    {                    // if a key is pressed
-        return _getch(); // return that key
+    if (Serial.available() > 0)
+    {                         // if a key is pressed
+        return Serial.read(); // return that key
     }
     else
     {
@@ -111,6 +42,60 @@ char getInput()
     */
 }
 
+void GameLogic::handleInput(char c)
+{
+    // process user input character (for testing we're using keyboard keys)
+    // will map corresponding keys to arduino pins
+    // Serial.print("Handling input: ");
+    // Serial.println(c);
+    // Add input handling logic here
+    switch (c)
+    {
+    case 'q':
+        // Serial.println("Escape key pressed. Exiting game.");
+        break;
+    case '1':
+        moleArr[0]->decreaseHp(1, p_di);
+        // Serial.println("Mole 0 hit!");
+        break;
+    case '2':
+        moleArr[1]->decreaseHp(1, p_di);
+        // Serial.println("Mole 1 hit!");
+        break;
+    case '3':
+        moleArr[2]->decreaseHp(1, p_di);
+        // Serial.println("Mole 2 hit!");
+        break;
+    case '4':
+        moleArr[3]->decreaseHp(1, p_di);
+        // Serial.println("Mole 3 hit!");
+        break;
+    case '5':
+        moleArr[4]->decreaseHp(1, p_di);
+        // Serial.println("Mole 4 hit!");
+        break;
+    case '6':
+        moleArr[5]->decreaseHp(1, p_di);
+        // Serial.println("Mole 5 hit!");
+        break;
+    case '7':
+        moleArr[6]->decreaseHp(1, p_di);
+        // Serial.println("Mole 6 hit!");
+        break;
+    case '8':
+        moleArr[7]->decreaseHp(1, p_di);
+        // Serial.println("Mole 7 hit!");
+        break;
+    case '9':
+        moleArr[8]->decreaseHp(1, p_di);
+        // Serial.println("Mole 8 hit!");
+        break;
+    default:
+        // Serial.println("Unhandled key pressed: " + String(c));
+        break;
+    }
+}
+
 GameLogic::~GameLogic()
 {
     // destructor to free dynamically allocated memory for moleArr
@@ -124,18 +109,18 @@ GameLogic::~GameLogic()
         }
     }
     delete[] moleArr;
-    // Serial.print("Game destructor called. Dynamically allocated memory for moleArr freed.");
+    // // Serial.print("Game destructor called. Dynamically allocated memory for moleArr freed.");
 }
 int GameLogic::getScore() const
 {
     // expected output: prints and returns the current score of the player
-    // Serial.print("Current score is" + String(score));
+    // // Serial.print("Current score is" + String(score));
     return score;
 }
 int GameLogic::getLives() const
 {
     // expected output: prints and returns the current number of lives of the player
-    // Serial.print("Current lives are " + String(lives));
+    // // Serial.print("Current lives are " + String(lives));
     return lives;
 }
 bool GameLogic::roundEnded() const
@@ -177,9 +162,9 @@ GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi)
     }
     score = 0;         // initializing score to 0
     lives = MAX_LIVES; // set to 3 but can update as difficulty increases
-    Serial.print("Game initialized with");
-    Serial.print(roundMaxMoles);
-    Serial.print(" moles and " + String(lives) + " lives." << endl);
+    // Serial.print("Game initialized with");
+    // Serial.print(roundMaxMoles);
+    // Serial.print(" moles and " + String(lives) + " lives.");
     this->p_di = p_di;
     this->p_mi = p_mi;
     maxMolesUp = 2;            // default value, can be changed later
@@ -195,7 +180,7 @@ GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi)
 DisplayInterface *GameLogic::getDisplayInterface() const
 {
     // expected output: returns pointer to DisplayInterface
-    // Serial.print("Returning pointer to Display interface");
+    // // Serial.print("Returning pointer to Display interface");
     return p_di;
 }
 
@@ -204,7 +189,7 @@ void GameLogic::setScore(int s)
     // takes new score as argument and sets the player's score to that value
     // expected output: player's score is set to the new value
     score = s;
-    // Serial.print("Player's score set to " + String(score));
+    // // Serial.print("Player's score set to " + String(score));
 }
 
 void GameLogic::setLives(int l)
@@ -212,13 +197,13 @@ void GameLogic::setLives(int l)
     // takes new lives as argument and sets the player's lives to that value
     // expected output: player's lives are set to the new value
     lives = l;
-    // Serial.print("Player's lives set to " + String(lives));
+    // // Serial.print("Player's lives set to " + String(lives));
 }
 
 Mole **GameLogic::getMoleArr() const
 {
     // expected output: returns the array of moles
-    // Serial.print("Returning array of moles.");
+    // // Serial.print("Returning array of moles.");
     return moleArr;
 }
 
@@ -227,8 +212,8 @@ void GameLogic::fsm()
     if (currentGameState == S_IDLE)
     {
         // implement a start button
-        Serial.print("Game is in IDLE state. Waiting to start..." << endl);
-        Serial.print("Press 's' to start the game." << endl);
+        // // Serial.println("Game is in IDLE state. Waiting to start...");
+        // // Serial.println("Press 's' to start the game.");
         char c = getInput();
         if (c == 's')
         {
@@ -247,12 +232,12 @@ void GameLogic::fsm()
         {
             moles_interface[i] = '\0';
         }
-        Serial.print("Game initialized. Starting first round." << endl);
+        // // Serial.print("Game initialized. Starting first round.");
         nextGameState = S_INITIALIZE_ROUND;
     }
     else if (currentGameState == S_INITIALIZE_ROUND)
     {
-        Serial.print("Starting new round." << endl);
+        // // Serial.print("Starting new round.");
         currNumMolesUp = 0;
         maxMolesUp = maxMolesUpForLevel(level);
         roundMaxMoles = molesPerLevel(level);
@@ -266,9 +251,9 @@ void GameLogic::fsm()
     }
     else if (currentGameState == S_PLAYING)
     {
-        Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        Serial.print("Round Time: " + String(int((millis() - startRound) / 1000)) + " seconds" << endl);
-        Serial.print("Mole lifetime ≈ " + String(minDurationForLevel(level) / 1000.0) + "-" + String(maxDurationForLevel(level) / 1000.0) + " seconds" << endl);
+        // // Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        // // Serial.print("Round Time: " + String(int((millis() - startRound) / 1000)) + " seconds");
+        // // Serial.print("Mole lifetime ≈ " + String(minDurationForLevel(level) / 1000.0) + "-" + String(maxDurationForLevel(level) / 1000.0) + " seconds");
 
         p_di->show_score(score); // update score display
 
@@ -345,14 +330,13 @@ void GameLogic::fsm()
                 moles_interface[i] = '\0'; // Mole is Down
             }
         }
-        Serial.print("----------------------------" << endl);
-        Serial.print("Moles Interface State:" << endl);
-        Serial.print("[" << moles_interface[0] << "][" << moles_interface[1] << "][" << moles_interface[2] << "]" << endl);
-        Serial.print("[" << moles_interface[3] << "][" << moles_interface[4] << "][" << moles_interface[5] << "]" << endl);
-        Serial.print("[" << moles_interface[6] << "][" << moles_interface[7] << "][" << moles_interface[8] << "]" << endl);
-        Serial.print("Number of Lives: " + String(lives) + "\n");
-        Serial.print("Number of Moles Left: " + String(roundMaxMoles - numMolesDownThisRound) + "\n\n");
-        delay(50);
+        // // // Serial.print("----------------------------");
+        // // Serial.print("Moles Interface State:");
+        // // Serial.print("["  moles_interface[0] moles_interface[1]  "]["  moles_interface[2] "]");
+        // // Serial.print("["  moles_interface[3]  "][" moles_interface[4]  "][" moles_interface[5] "]");
+        // // Serial.print("["  moles_interface[6]  "]["  moles_interface[7]  "][" moles_interface[8] "]");
+        // // Serial.print("Number of Lives: " + String(lives) + "\n");
+        // // Serial.print("Number of Moles Left: " + String(roundMaxMoles - numMolesDownThisRound) + "\n\n");
         if (gameEnded())
         {
             nextGameState = S_GAMEOVER;
@@ -376,64 +360,31 @@ void GameLogic::fsm()
     {
         // Handle game over state
         // print game over
-        Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        Serial.print("Game has ended. Final score: " + String(score) << endl);
-        Serial.print("\n\n"
-                     << endl);
+        // Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        // Serial.print("Game has ended. Final score: " + String(score));
+        // Serial.print("\n\n"
+                    
         // delay to simulate display time
         nextGameState = S_IDLE;
     }
     else if (currentGameState == S_LEADERBOARD)
     {
         // Handle leaderboard state
-        string input;
-        while (input.length() == 0)
-        {
-            Serial.print("Enter your name for the leaderboard: " << endl);
-            getline(cin, input);
-            stringstream line(input);
-        }
+        // string input;
+        // while (input.length() == 0)
+        // {
+        //     // Serial.print("Enter your name for the leaderboard: ");
+        //     getline(cin, input);
+        //     stringstream line(input);
+        // }
 
-        // display line on the leaderboard
-        Serial.print("Thank you for playing, " + String(input.c_str()) + "!" << endl);
+        // // display line on the leaderboard
+        // // Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
         nextGameState = S_IDLE;
     }
     else
     {
-        Serial.print("Unknown game state!") << endl;
+        // Serial.print("Unknown game state!");
     }
     currentGameState = nextGameState;
-}
-char getInput()
-{
-
-    if (Serial.available() > 0)
-    {                         // if a key is pressed
-        return Serial.read(); // return that key
-    }
-    else
-    {
-        return '\0'; // default: no key pressed
-    }
-
-    /*
-    if (kbhit() > 0)
-    { // usually just written as `if( kbhit() )`
-        int input_int = getchar();
-        char input = (char)input_int;
-        if (input_int == EOF)
-        {
-            // Handle the EOF case, perhaps by returning a sentinel value
-            input = '\0'; // or some other appropriate value
-        }
-
-        inputs += input;
-        return input;
-    }
-    else
-    {
-        return '\0';
-    }
-
-    */
 }

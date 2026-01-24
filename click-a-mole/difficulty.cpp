@@ -9,7 +9,7 @@ unsigned long minSpawnIntervalForLevel(int level)
         level = 1;
     double start = 1000.0;
     double k = 0.08;
-    double val = start * std::exp(-k * (level - 1));
+    double val = start * exp(-k * (level - 1));
 
     return (unsigned long)val;
 };
@@ -64,7 +64,7 @@ unsigned long maxDurationForLevel(int level)
     double extraMs = 2500.0; // so L1: 1000 + 2500 = 3500 ms
     double k = 0.09;
 
-    double val = floorMs + extraMs * std::exp(-k * (level - 1));
+    double val = floorMs + extraMs * exp(-k * (level - 1));
     return (unsigned long)val;
 }
 
@@ -77,7 +77,7 @@ double targetCpsForLevel(int level)
     double cpsMax = 4.0;
     double k = 0.15;
 
-    return cpsMin + (cpsMax - cpsMin) * (1.0 - std::exp(-k * (level - 1)));
+    return cpsMin + (cpsMax - cpsMin) * (1.0 - exp(-k * (level - 1)));
 }
 
 int computeHpForMole(int level, unsigned long durationMs)
@@ -86,7 +86,7 @@ int computeHpForMole(int level, unsigned long durationMs)
     double expectedClicks = cps * (durationMs / 1000.0);
 
     double baseHP = expectedClicks * 0.7; // give some slack
-    int hp = (int)std::round(baseHP);
+    int hp = (int)round(baseHP);
 
     hp = (hp > 1) ? hp : 1;
     hp = (hp < 6) ? hp : 6;
@@ -102,7 +102,7 @@ int randomHpForMole(int level, unsigned long durationMs)
     return minHP + (rand() % range);
 }
 
-#include <cmath>
+#include <math.h>
 
 int maxMolesUpForLevel(int level)
 {
@@ -111,7 +111,7 @@ int maxMolesUpForLevel(int level)
 
     // 1 + floor(log2(level)):
     // L1 → 1, L2–3 → 2, L4–7 → 3, L8–15 → 4, L16–31 → 5, etc.
-    int maxUp = 1 + static_cast<int>(std::floor(std::log2(static_cast<double>(level))));
+    int maxUp = 1 + static_cast<int>(floor(log(static_cast<double>(level))/log(2)));
 
     // never exceed number of holes
     if (maxUp > 9)

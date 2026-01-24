@@ -12,9 +12,12 @@ void setup()
     p_di = new DisplayInterface; // Placeholder, replace with actual DisplayInterface object
     p_mi = new MotorInterface;   // Placeholder, replace with actual MotorInterface
     game = new GameLogic(p_di, p_mi);
-    // MoleController::init()
 }
+
 void loop()
 {
+    int gameLoopStartTime = millis();
     game->fsm();
+    int gameLoopEndTime = millis();
+    Serial.println(gameLoopEndTime - gameLoopStartTime);
 }
