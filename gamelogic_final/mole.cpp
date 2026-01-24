@@ -3,7 +3,6 @@
 #include "arduino.h"
 #include <iostream>
 #include "led_interface.h"
-using namespace std;
 
 void Mole::setLastDownTime(unsigned long time)
 {
