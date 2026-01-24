@@ -1,7 +1,7 @@
 #include "gamelogic.h"
 #include "mole.h"
 #include "led_interface.h"
-
+#include <Arduino.h>
 void Mole::setLastDownTime(unsigned long time)
 {
     lastDownTime = time;
