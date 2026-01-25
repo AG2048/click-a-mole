@@ -2,6 +2,7 @@
 #include "mole.h"
 #include "led_interface.h"
 #include <Arduino.h>
+#include "MoleController.h"
 void Mole::setLastDownTime(unsigned long time)
 {
     lastDownTime = time;
@@ -110,7 +111,7 @@ void Mole::handleTimeIsUp(GameLogic *game)
 
 // call this only when mole is hit AND RELEASED
 
-void Mole::decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di)
+void Mole::decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di, MoleController *p_mi)
 {
     // takes an integer argument to decrease the mole's HP by that amount
     // expected output: mole's HP decreases by the specified amount
@@ -123,6 +124,7 @@ void Mole::decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di)
     }
     HP -= delta_to_decrease_by;
     p_di->changeMoleHP(ID, HP, 3); // assuming max HP is 3
+    p_mi->setHp(ID, HP, 3);
     if (HP < 0)
         HP = 0; // Ensure HP doesn't go negative
     // // Serial.print("Mole's HP decreased by ");

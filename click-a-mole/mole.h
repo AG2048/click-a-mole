@@ -1,6 +1,7 @@
 #ifndef MOLE_H
 #define MOLE_H
 class DisplayInterface; // forward declaration of DisplayInterface class
+class MoleController;
 class GameLogic;        // forward declaration of GameLogic class
 
 class Mole
@@ -35,7 +36,7 @@ public:
     bool getPosition() const;                                          // get position of mole
     void handleTimeIsUp(GameLogic *game);                              // handles when mole's internal timer is up
     bool getTimeIsUp() const;                                          // get timeIsUp status
-    void decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di); // decrease HP by a certain amount
+    void decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di, MoleController *p_mi); // decrease HP by a certain amount
     void increaseHp(int delta_to_increase_by, DisplayInterface *p_di); // increase HP by a certain amount
     void setStartTime(unsigned long time);                             // sets startime to time when mole comes
     void setDuration(unsigned long dur);                               // sets duration for which mole stays up

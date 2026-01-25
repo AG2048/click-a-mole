@@ -14,7 +14,7 @@ enum GameState
 };
 
 class DisplayInterface; // forward declaration of DisplayInterface class
-class MotorInterface;   // forward declaration of MotorInterface class
+class MoleController;   // forward declaration of MoleController class
 class GameLogic
 {
 private:
@@ -27,7 +27,7 @@ private:
     int maxMolesUp;              // maximum number of moles that can be up at once
     int currNumMolesUp;          // number of moles up at the same time
     int numMolesDownThisRound;   // number of moles that have gone down this round
-    int moles_interface[9];      // represents the state of each mole in the interface
+    int moles_interface[1];      // represents the state of each mole in the interface
     int level;
     unsigned long lastSpawnTime;
     unsigned long nextSpawnDelay;
@@ -35,11 +35,11 @@ private:
     GameState currentGameState;
     GameState nextGameState;
     DisplayInterface *p_di;
-    MotorInterface *p_mi;
+    MoleController *p_mi;
 
 public:
     void handleInput(char c);                                // process user input character
-    GameLogic(DisplayInterface *p_di, MotorInterface *p_mi); // constructor to initialize game with number of moles and initial lives
+    GameLogic(DisplayInterface *p_di, MoleController *p_mi); // constructor to initialize game with number of moles and initial lives
     bool gameEnded();                                        // check if game has ended
     ~GameLogic();                                            // destructor to free dynamically allocated memory
     bool roundEnded() const;                                 // check if round has ended

@@ -1,11 +1,11 @@
 #include "mole.h"
 #include "gamelogic.h"
 #include "led_interface.h"
-#include "motor_interface.h"
+#include "MoleController.h"
 #include "difficulty.h"
 #include <Arduino.h>
 #include <stdlib.h> // for rand() and srand()
-#define TOTAL_MOLES 9
+#define TOTAL_MOLES 1 // CHANGE: TOTAL_MOLES 3
 #define MAX_LIVES 3
 
 char getInput()
@@ -55,41 +55,41 @@ void GameLogic::handleInput(char c)
         // Serial.println("Escape key pressed. Exiting game.");
         break;
     case '1':
-        moleArr[0]->decreaseHp(1, p_di);
+        moleArr[0]->decreaseHp(1, p_di, p_mi);
         // Serial.println("Mole 0 hit!");
         break;
-    case '2':
-        moleArr[1]->decreaseHp(1, p_di);
-        // Serial.println("Mole 1 hit!");
-        break;
-    case '3':
-        moleArr[2]->decreaseHp(1, p_di);
-        // Serial.println("Mole 2 hit!");
-        break;
-    case '4':
-        moleArr[3]->decreaseHp(1, p_di);
-        // Serial.println("Mole 3 hit!");
-        break;
-    case '5':
-        moleArr[4]->decreaseHp(1, p_di);
-        // Serial.println("Mole 4 hit!");
-        break;
-    case '6':
-        moleArr[5]->decreaseHp(1, p_di);
-        // Serial.println("Mole 5 hit!");
-        break;
-    case '7':
-        moleArr[6]->decreaseHp(1, p_di);
-        // Serial.println("Mole 6 hit!");
-        break;
-    case '8':
-        moleArr[7]->decreaseHp(1, p_di);
-        // Serial.println("Mole 7 hit!");
-        break;
-    case '9':
-        moleArr[8]->decreaseHp(1, p_di);
-        // Serial.println("Mole 8 hit!");
-        break;
+    // case '2':
+    //     moleArr[1]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 1 hit!");
+    //     break;
+    // case '3':
+    //     moleArr[2]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 2 hit!");
+    //     break;
+    // case '4':
+    //     moleArr[3]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 3 hit!");
+    //     break;
+    // case '5':
+    //     moleArr[4]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 4 hit!");
+    //     break;
+    // case '6':
+    //     moleArr[5]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 5 hit!");
+    //     break;
+    // case '7':
+    //     moleArr[6]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 6 hit!");
+    //     break;
+    // case '8':
+    //     moleArr[7]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 7 hit!");
+    //     break;
+    // case '9':
+    //     moleArr[8]->decreaseHp(1, p_di, p_mi);
+    //     // Serial.println("Mole 8 hit!");
+    //     break;
     default:
         // Serial.println("Unhandled key pressed: " + String(c));
         break;
@@ -135,7 +135,7 @@ bool GameLogic::gameEnded()
     return (lives <= 0);
 }
 
-GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi)
+GameLogic::GameLogic(DisplayInterface *p_di, MoleController *p_mi)
 {
     currentGameState = S_IDLE;
     nextGameState = S_IDLE;
@@ -167,7 +167,7 @@ GameLogic::GameLogic(DisplayInterface *p_di, MotorInterface *p_mi)
     // Serial.print(" moles and " + String(lives) + " lives.");
     this->p_di = p_di;
     this->p_mi = p_mi;
-    maxMolesUp = 2;            // default value, can be changed later
+    maxMolesUp = 1;            // default value, can be changed later
     roundMaxMoles = 10;        // default value, can be changed later
     currNumMolesUp = 0;        // number of moles up at the same time
     numMolesDownThisRound = 0; // number of moles that have gone down this round
@@ -212,12 +212,12 @@ void GameLogic::fsm()
     if (currentGameState == S_IDLE)
     {
         // implement a start button
-        // // Serial.println("Game is in IDLE state. Waiting to start...");
-        // // Serial.println("Press 's' to start the game.");
+        // Serial.println("Game is in IDLE state. Waiting to start...");
+        // Serial.println("Press 's' to start the game.");
         char c = getInput();
         if (c == 's')
         {
-            srand(millis()); // seed random number generator
+            // srand(millis()); // seed random number generator
             nextGameState = S_INITIALIZE_GAME;
         }
         else
@@ -228,11 +228,11 @@ void GameLogic::fsm()
     }
     else if (currentGameState == S_INITIALIZE_GAME)
     {
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 1; i++)
         {
             moles_interface[i] = '\0';
         }
-        // // Serial.print("Game initialized. Starting first round.");
+        Serial.print("Game initialized. Starting first round.");
         nextGameState = S_INITIALIZE_ROUND;
     }
     else if (currentGameState == S_INITIALIZE_ROUND)
@@ -254,12 +254,12 @@ void GameLogic::fsm()
         // // Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         // // Serial.print("Round Time: " + String(int((millis() - startRound) / 1000)) + " seconds");
         // // Serial.print("Mole lifetime ≈ " + String(minDurationForLevel(level) / 1000.0) + "-" + String(maxDurationForLevel(level) / 1000.0) + " seconds");
-
+        p_mi->updateAll();
         p_di->show_score(score); // update score display
 
         unsigned long now = millis();
-        int idx = rand() % 9;
-        Mole *m = moleArr[idx];
+        // int idx = rand() %;
+        Mole *m = moleArr[0];
         // try to spawn a new mole if:
         // 1. enough time passed since last spawn
         // 2. we have capacity (currNumMolesUp < maxNumMolesUp)
@@ -271,14 +271,14 @@ void GameLogic::fsm()
             now - m->getLastDownTime() >= MOLE_RESPAWN_COOLDOWN_MS)
         {
             delete m; // free existing mole
-            int spawnType = rand() % 2;
+            int spawnType = rand() % 1; // CHANGE: rand() % 2
             if (spawnType == 0)
             {
-                m = new Black(idx);
+                m = new Black(0);
             }
             else
             {
-                m = new White(idx);
+                m = new White(0);
             }
             unsigned long minDur = minDurationForLevel(level);
             unsigned long maxDur = maxDurationForLevel(level);
@@ -296,6 +296,7 @@ void GameLogic::fsm()
             int hp = randomHpForMole(level, lifetime);
             m->setMaxHP(hp);
             m->setHP(hp);
+            p_mi->setHp(0, hp, hp);
             m->setPosition(true, p_di); // set mole to up position
             currNumMolesUp++;
             lastSpawnTime = now;
@@ -358,12 +359,13 @@ void GameLogic::fsm()
     }
     else if (currentGameState == S_GAMEOVER)
     {
+        p_mi->resetHp(); // TO DO + loop over moles to reset hp and position
         // Handle game over state
         // print game over
         // Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         // Serial.print("Game has ended. Final score: " + String(score));
         // Serial.print("\n\n"
-                    
+
         // delay to simulate display time
         nextGameState = S_IDLE;
     }

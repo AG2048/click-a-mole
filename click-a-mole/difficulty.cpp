@@ -65,7 +65,8 @@ unsigned long maxDurationForLevel(int level)
     double k = 0.09;
 
     double val = floorMs + extraMs * exp(-k * (level - 1));
-    return (unsigned long)val;
+    // return (unsigned long)val;
+    return 15000;
 }
 
 // target CPS goes from 0.5 to 4 as level grows

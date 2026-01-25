@@ -4,8 +4,8 @@
 void DisplayInterface::show_score(int current_score)
 {
 
-    Serial.print("Displaying current score: ");
-    Serial.println(current_score);
+    // Serial.print("Displaying current score: ");
+    // Serial.println(current_score);
     // Code to interface with the actual LED hardware would go here
 }
 
