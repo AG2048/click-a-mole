@@ -1,6 +1,5 @@
 #include "gamelogic.h"
 #include "led_interface.h"
-#include "motor_interface.h"
 #include <Arduino.h>
 #include "MoleController.h"
 #include "MoleModule.h"
@@ -101,5 +100,5 @@ void loop()
     int gameLoopStartTime = micros();
     game->fsm();
     int gameLoopEndTime = micros();
-    Serial.println(gameLoopEndTime - gameLoopStartTime);
+    // Serial.println(gameLoopEndTime - gameLoopStartTime);
 }

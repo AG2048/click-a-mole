@@ -4,7 +4,7 @@
 #include "MoleController.h"
 #include "difficulty.h"
 #include <Arduino.h>
-#include <stdlib.h> // for rand() and srand()
+#include <stdlib.h>   // for rand() and srand()
 #define TOTAL_MOLES 1 // CHANGE: TOTAL_MOLES 3
 #define MAX_LIVES 3
 
@@ -56,7 +56,7 @@ void GameLogic::handleInput(char c)
         break;
     case '1':
         moleArr[0]->decreaseHp(1, p_di, p_mi);
-        // Serial.println("Mole 0 hit!");
+        Serial.println("Mole 0 hit!");
         break;
     // case '2':
     //     moleArr[1]->decreaseHp(1, p_di, p_mi);
@@ -255,6 +255,7 @@ void GameLogic::fsm()
         // // Serial.print("Round Time: " + String(int((millis() - startRound) / 1000)) + " seconds");
         // // Serial.print("Mole lifetime ≈ " + String(minDurationForLevel(level) / 1000.0) + "-" + String(maxDurationForLevel(level) / 1000.0) + " seconds");
         p_mi->updateAll();
+        p_mi->readButtons(buttonStates);
         p_di->show_score(score); // update score display
 
         unsigned long now = millis();
@@ -270,7 +271,7 @@ void GameLogic::fsm()
             m->getPosition() == false &&
             now - m->getLastDownTime() >= MOLE_RESPAWN_COOLDOWN_MS)
         {
-            delete m; // free existing mole
+            delete m;                   // free existing mole
             int spawnType = rand() % 1; // CHANGE: rand() % 2
             if (spawnType == 0)
             {
@@ -307,10 +308,21 @@ void GameLogic::fsm()
         {
             nextGameState = S_IDLE;
         }
-        else
+        else if (c >= '1' && c < '1' + TOTAL_MOLES)
         {
-            handleInput(c);
+            buttonStates[c - '1'] = 1; // mark button as pressed
         }
+
+        for (int i = 0; i < TOTAL_MOLES; i++)
+        {
+            if (buttonStates[i] == 1)
+            {
+                handleInput('1' + i); // map button press to corresponding mole hit
+            }
+        }
+
+        p_mi->readButtons(buttonStates); // read button states again after handling input
+
         for (int i = 0; i < TOTAL_MOLES; i++)
         {
             bool oldPosition = moleArr[i]->getPosition();
@@ -331,13 +343,31 @@ void GameLogic::fsm()
                 moles_interface[i] = '\0'; // Mole is Down
             }
         }
-        // // // Serial.print("----------------------------");
-        // // Serial.print("Moles Interface State:");
-        // // Serial.print("["  moles_interface[0] moles_interface[1]  "]["  moles_interface[2] "]");
-        // // Serial.print("["  moles_interface[3]  "][" moles_interface[4]  "][" moles_interface[5] "]");
-        // // Serial.print("["  moles_interface[6]  "]["  moles_interface[7]  "][" moles_interface[8] "]");
-        // // Serial.print("Number of Lives: " + String(lives) + "\n");
-        // // Serial.print("Number of Moles Left: " + String(roundMaxMoles - numMolesDownThisRound) + "\n\n");
+        Serial.println(F("----------------------------"));
+    Serial.println(F("Moles Interface State:"));
+
+    // Row 1
+    Serial.print(F("[")); Serial.print(moles_interface[0]); Serial.print(F("]"));
+    // Serial.print(F("[")); Serial.print(moles_interface[1]); Serial.print(F("]"));
+    // Serial.print(F("[")); Serial.print(moles_interface[2]); Serial.println(F("]"));
+
+    // // Row 2
+    // Serial.print(F("[")); Serial.print(moles_interface[3]); Serial.print(F("]"));
+    // Serial.print(F("[")); Serial.print(moles_interface[4]); Serial.print(F("]"));
+    // Serial.print(F("[")); Serial.print(moles_interface[5]); Serial.println(F("]"));
+
+    // // Row 3
+    // Serial.print(F("[")); Serial.print(moles_interface[6]); Serial.print(F("]"));
+    // Serial.print(F("[")); Serial.print(moles_interface[7]); Serial.print(F("]"));
+
+    // Status Info
+    Serial.print(F("Number of Lives: "));
+    Serial.println(lives);
+
+    Serial.print(F("Number of Moles Left: "));
+    Serial.println(roundMaxMoles - numMolesDownThisRound);
+    Serial.println(); // Extra newline for spacing
+
         if (gameEnded())
         {
             nextGameState = S_GAMEOVER;
