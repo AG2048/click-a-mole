@@ -97,8 +97,8 @@ void setup()
 
 void loop()
 {
-    int gameLoopStartTime = micros();
+    uint32_t gameLoopStartTime = micros();
     game->fsm();
-    int gameLoopEndTime = micros();
+    uint32_t gameLoopEndTime = micros();
     // Serial.println(gameLoopEndTime - gameLoopStartTime);
 }

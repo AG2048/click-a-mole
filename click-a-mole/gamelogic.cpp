@@ -5,7 +5,7 @@
 #include "difficulty.h"
 #include <Arduino.h>
 #include <stdlib.h>   // for rand() and srand()
-#define TOTAL_MOLES 1 // CHANGE: TOTAL_MOLES 3
+#define TOTAL_MOLES 8 // CHANGE: TOTAL_MOLES 3
 #define MAX_LIVES 3
 
 char getInput()
@@ -259,8 +259,8 @@ void GameLogic::fsm()
         p_di->show_score(score); // update score display
 
         unsigned long now = millis();
-        // int idx = rand() %;
-        Mole *m = moleArr[0];
+        int idx = rand() % 8;
+        Mole *m = moleArr[idx];
         // try to spawn a new mole if:
         // 1. enough time passed since last spawn
         // 2. we have capacity (currNumMolesUp < maxNumMolesUp)
@@ -343,20 +343,20 @@ void GameLogic::fsm()
                 moles_interface[i] = '\0'; // Mole is Down
             }
         }
-        Serial.println(F("----------------------------"));
-    Serial.println(F("Moles Interface State:"));
+    //     Serial.println(F("----------------------------"));
+    // Serial.println(F("Moles Interface State:"));
 
-    // Row 1
-    Serial.print(F("[")); Serial.print(moles_interface[0]); Serial.print(F("]"));
+    // // Row 1
+    // Serial.print(F("[")); Serial.print(moles_interface[0]); Serial.print(F("]"));
     // Serial.print(F("[")); Serial.print(moles_interface[1]); Serial.print(F("]"));
     // Serial.print(F("[")); Serial.print(moles_interface[2]); Serial.println(F("]"));
 
-    // // Row 2
+    // // // Row 2
     // Serial.print(F("[")); Serial.print(moles_interface[3]); Serial.print(F("]"));
     // Serial.print(F("[")); Serial.print(moles_interface[4]); Serial.print(F("]"));
     // Serial.print(F("[")); Serial.print(moles_interface[5]); Serial.println(F("]"));
 
-    // // Row 3
+    // // // Row 3
     // Serial.print(F("[")); Serial.print(moles_interface[6]); Serial.print(F("]"));
     // Serial.print(F("[")); Serial.print(moles_interface[7]); Serial.print(F("]"));
 

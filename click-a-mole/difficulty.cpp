@@ -11,7 +11,8 @@ unsigned long minSpawnIntervalForLevel(int level)
     double k = 0.08;
     double val = start * exp(-k * (level - 1));
 
-    return (unsigned long)val;
+    // return (unsigned long)val;
+    return 1000;
 };
 
 // Level 1: ~2000 ms, shrinks toward 1000 ms as level increases.
@@ -24,7 +25,8 @@ unsigned long maxSpawnIntervalForLevel(int level)
     double k = 0.08;
 
     double val = floor + extra * exp(-k * (level - 1));
-    return (unsigned long)val;
+    // return (unsigned long)val;
+    return 1002;
 };
 
 // This function calculates a random spawn delay between different moles
@@ -39,7 +41,8 @@ unsigned long randomSpawnDelayForLevel(int level)
     unsigned long hi = (minI > maxI) ? minI : maxI;
 
     unsigned long range = hi - lo + 1;
-    return lo + (rand() % range);
+    // return lo + (rand() % range);
+    return 1000;
 }
 
 // min lifetime shrinks from ~2000 ms → ~600 ms as level increases
@@ -51,7 +54,8 @@ unsigned long minDurationForLevel(int level)
     double extra = 1400.0;
     double k = 0.12;
 
-    return (unsigned long)(floor + extra * exp(-k * (level - 1)));
+    // return (unsigned long)(floor + extra * exp(-k * (level - 1)));
+    return 15000;
 };
 
 // max lifetime shrinks from ~3500 ms → ~1000 ms
@@ -118,7 +122,8 @@ int maxMolesUpForLevel(int level)
     if (maxUp > 9)
         maxUp = 9;
 
-    return maxUp;
+    //return maxUp;
+    return 8;
 }
 
 // Helper: waves grow roughly linearly with level

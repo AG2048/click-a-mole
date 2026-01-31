@@ -28,7 +28,7 @@ private:
     int maxMolesUp;              // maximum number of moles that can be up at once
     int currNumMolesUp;          // number of moles up at the same time
     int numMolesDownThisRound;   // number of moles that have gone down this round
-    int moles_interface[1];      // represents the state of each mole in the interface
+    int moles_interface[8];      // represents the state of each mole in the interface
     int level;
     unsigned long lastSpawnTime;
     unsigned long nextSpawnDelay;
