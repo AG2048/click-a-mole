@@ -89,17 +89,17 @@ void setup()
             7                         // mux channel
             ));
 
-    Serial.println("Setup init");
+    Serial.println(F("Setup init"));
     // delay(500);
 
     p_mi->startTimer();
-    Serial.println("Setup complete");
+    Serial.println(F("Setup complete"));
 }
 
 void loop()
 {
-    int gameLoopStartTime = millis();
+    int gameLoopStartTime = micros();
     game->fsm();
-    int gameLoopEndTime = millis();
-    // Serial.println(gameLoopEndTime - gameLoopStartTime);
+    int gameLoopEndTime = micros();
+    Serial.println(gameLoopEndTime - gameLoopStartTime);
 }

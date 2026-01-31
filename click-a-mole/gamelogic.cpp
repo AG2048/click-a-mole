@@ -140,18 +140,18 @@ GameLogic::GameLogic(DisplayInterface *p_di, MoleController *p_mi)
     currentGameState = S_IDLE;
     nextGameState = S_IDLE;
     // make sure to free any existing memory before allocating new memory for moleArr
-    if (moleArr != nullptr)
-    {
-        for (int i = 0; i < TOTAL_MOLES; i++)
-        {
-            if (moleArr[i] != nullptr)
-            {
-                delete moleArr[i];
-                moleArr[i] = nullptr;
-            }
-        }
-        delete[] moleArr; // free existing memory if any
-    }
+    // if (moleArr != nullptr)
+    // {
+    //     for (int i = 0; i < TOTAL_MOLES; i++)
+    //     {
+    //         if (moleArr[i] != nullptr)
+    //         {
+    //             delete moleArr[i];
+    //             moleArr[i] = nullptr;
+    //         }
+    //     }
+    //     delete[] moleArr; // free existing memory if any
+    // }
     // constructor to initialize game with number of moles and initial lives
     // dynamically allocates memory for moleArr and initializes each Mole object
     moleArr = new Mole *[TOTAL_MOLES]; // dynamically allocating array of pointers to Mole objects
@@ -162,9 +162,9 @@ GameLogic::GameLogic(DisplayInterface *p_di, MoleController *p_mi)
     }
     score = 0;         // initializing score to 0
     lives = MAX_LIVES; // set to 3 but can update as difficulty increases
-    // Serial.print("Game initialized with");
-    // Serial.print(roundMaxMoles);
-    // Serial.print(" moles and " + String(lives) + " lives.");
+    // Serial.print(F("Game initialized with"));
+    // Serial.print(F(roundMaxMoles));
+    // Serial.print(F(" moles and " + String(lives) + " lives."));
     this->p_di = p_di;
     this->p_mi = p_mi;
     maxMolesUp = 1;            // default value, can be changed later
@@ -228,11 +228,11 @@ void GameLogic::fsm()
     }
     else if (currentGameState == S_INITIALIZE_GAME)
     {
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < TOTAL_MOLES; i++)
         {
-            moles_interface[i] = '\0';
+            moles_interface[i] = '0';
         }
-        Serial.print("Game initialized. Starting first round.");
+        Serial.print(F("Game initialized. Starting first round."));
         nextGameState = S_INITIALIZE_ROUND;
     }
     else if (currentGameState == S_INITIALIZE_ROUND)
@@ -311,7 +311,7 @@ void GameLogic::fsm()
         {
             handleInput(c);
         }
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < TOTAL_MOLES; i++)
         {
             bool oldPosition = moleArr[i]->getPosition();
             moleArr[i]->update(this); // update all moles
