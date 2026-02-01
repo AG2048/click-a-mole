@@ -19,9 +19,9 @@ protected:
     unsigned long lastHealTime;
     void getCurrentTime();  // updates currenttime with millis()
     void checkIfTimeIsUp(); // checks if currenttime - startime >= duration
-    int maxHP;
 
 public:
+    int maxHP;
     // implemented:
     Mole(int ID);
     virtual ~Mole() {};                       // destructor

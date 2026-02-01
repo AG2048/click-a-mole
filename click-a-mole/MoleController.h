@@ -3,7 +3,7 @@
 
 #include "MoleModule.h"
 
-#define T1_CMPA 1600
+#define T1_CMPA 3200
 #define TCA9548A_ADDRESS 0x70
 
 class MoleController

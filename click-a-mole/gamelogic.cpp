@@ -58,38 +58,38 @@ void GameLogic::handleInput(char c)
         moleArr[0]->decreaseHp(1, p_di, p_mi);
         Serial.println("Mole 0 hit!");
         break;
-    // case '2':
-    //     moleArr[1]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 1 hit!");
-    //     break;
-    // case '3':
-    //     moleArr[2]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 2 hit!");
-    //     break;
-    // case '4':
-    //     moleArr[3]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 3 hit!");
-    //     break;
-    // case '5':
-    //     moleArr[4]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 4 hit!");
-    //     break;
-    // case '6':
-    //     moleArr[5]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 5 hit!");
-    //     break;
-    // case '7':
-    //     moleArr[6]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 6 hit!");
-    //     break;
-    // case '8':
-    //     moleArr[7]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 7 hit!");
-    //     break;
-    // case '9':
-    //     moleArr[8]->decreaseHp(1, p_di, p_mi);
-    //     // Serial.println("Mole 8 hit!");
-    //     break;
+    case '2':
+        moleArr[1]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 1 hit!");
+        break;
+    case '3':
+        moleArr[2]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 2 hit!");
+        break;
+    case '4':
+        moleArr[3]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 3 hit!");
+        break;
+    case '5':
+        moleArr[4]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 4 hit!");
+        break;
+    case '6':
+        moleArr[5]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 5 hit!");
+        break;
+    case '7':
+        moleArr[6]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 6 hit!");
+        break;
+    case '8':
+        moleArr[7]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 7 hit!");
+        break;
+    case '9':
+        moleArr[8]->decreaseHp(1, p_di, p_mi);
+        // Serial.println("Mole 8 hit!");
+        break;
     default:
         // Serial.println("Unhandled key pressed: " + String(c));
         break;
@@ -255,8 +255,11 @@ void GameLogic::fsm()
         // // Serial.print("Round Time: " + String(int((millis() - startRound) / 1000)) + " seconds");
         // // Serial.print("Mole lifetime ≈ " + String(minDurationForLevel(level) / 1000.0) + "-" + String(maxDurationForLevel(level) / 1000.0) + " seconds");
         p_mi->updateAll();
+
         p_mi->readButtons(buttonStates);
         p_di->show_score(score); // update score display
+
+        
 
         unsigned long now = millis();
         int idx = rand() % 8;
@@ -318,7 +321,10 @@ void GameLogic::fsm()
             if (buttonStates[i] == 1)
             {
                 handleInput('1' + i); // map button press to corresponding mole hit
+                buttonStates[i] = 0;
             }
+            Serial.println(moleArr[i]->getHP());
+            Serial.println(moleArr[i]->maxHP);
         }
 
         p_mi->readButtons(buttonStates); // read button states again after handling input
@@ -347,18 +353,18 @@ void GameLogic::fsm()
     // Serial.println(F("Moles Interface State:"));
 
     // // Row 1
-    // Serial.print(F("[")); Serial.print(moles_interface[0]); Serial.print(F("]"));
-    // Serial.print(F("[")); Serial.print(moles_interface[1]); Serial.print(F("]"));
-    // Serial.print(F("[")); Serial.print(moles_interface[2]); Serial.println(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[0]); Serial.print(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[1]); Serial.print(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[2]); Serial.println(F("]"));
 
     // // // Row 2
-    // Serial.print(F("[")); Serial.print(moles_interface[3]); Serial.print(F("]"));
-    // Serial.print(F("[")); Serial.print(moles_interface[4]); Serial.print(F("]"));
-    // Serial.print(F("[")); Serial.print(moles_interface[5]); Serial.println(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[3]); Serial.print(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[4]); Serial.print(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[5]); Serial.println(F("]"));
 
     // // // Row 3
-    // Serial.print(F("[")); Serial.print(moles_interface[6]); Serial.print(F("]"));
-    // Serial.print(F("[")); Serial.print(moles_interface[7]); Serial.print(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[6]); Serial.print(F("]"));
+    Serial.print(F("[")); Serial.print(moles_interface[7]); Serial.print(F("]"));
 
     // Status Info
     Serial.print(F("Number of Lives: "));

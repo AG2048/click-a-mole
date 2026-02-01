@@ -56,6 +56,7 @@ void MoleModule::update(TCA9548A& mux) {
     sensor.init();
     currAngle = sensor.readAngle();
     mux.closeChannel(sensorID);
+
     // Serial.print("Angle: ");
     // Serial.println(currAngle);
 
@@ -85,6 +86,7 @@ void MoleModule::update(TCA9548A& mux) {
     // return;
     // calculate dstVelocity
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { dstVelocity = minVelocity + (maxVelocity - minVelocity) / TOTAL_DEGREES_PER_ROLL * error; }
+    
 }
 
 int MoleModule::readButton() {

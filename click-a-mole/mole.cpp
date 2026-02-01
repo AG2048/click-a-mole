@@ -123,8 +123,8 @@ void Mole::decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di, MoleCont
         return;
     }
     HP -= delta_to_decrease_by;
-    p_di->changeMoleHP(ID, HP, 3); // assuming max HP is 3
-    p_mi->setHp(ID, HP, 3);
+    p_di->changeMoleHP(ID, HP, maxHP); // assuming max HP is 3
+    p_mi->setHp(ID, HP, maxHP);
     if (HP < 0)
         HP = 0; // Ensure HP doesn't go negative
     // // Serial.print("Mole's HP decreased by ");
