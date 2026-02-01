@@ -7,8 +7,8 @@
 #include "Adafruit_LEDBackpack.h"
 #include <Wire.h>
 
-//#include "Adafruit_GFX.h"  
-//#include "Adafruit_SSD1306.h"
+#include "Adafruit_GFX.h"  
+#include "Adafruit_SSD1306.h"
 
 // Define constants for OLED
 #define SCREEN_WIDTH 128
@@ -132,9 +132,9 @@ class DisplayInterface {
         bool sevenSegReady = false;
         uint8_t sevenSegAddr = 0x75; // default address?
 
-        // // OLED Display
-        // Adafruit_SSD1306 oled;
-        // bool oledReady = false;
+        // OLED Display
+        Adafruit_SSD1306 oled = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET_PIN);
+        bool oledReady = false;
 
         //internal helper functions
         AnimationObject* queue_animation(
@@ -166,4 +166,5 @@ class DisplayInterface {
 };
 
 #endif 
+
 
