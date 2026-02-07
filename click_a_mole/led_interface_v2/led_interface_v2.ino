@@ -127,6 +127,7 @@ void loop() {
     } else {
       // save on the third push
       display.entering_names_to_leaderboard(hovered_letter, name_letters[0], name_letters[1], name_letters[2], final_score, fill_index, true);
+    }
   }
 
 

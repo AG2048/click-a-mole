@@ -114,7 +114,7 @@ class DisplayInterface {
         void show_idle_oled_animation(); // Show OLED idle animation
         void update_oled_gameplay(int current_level, int current_round, int score); // Updates oled during the game play
         void prompt_leaderboard_name_entry(); 
-        void entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, int final_score, int fill_index, bool confirm); 
+        void entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, int final_score, uint8_t fill_index, bool confirm); 
         void show_leaderboard(const char* leaderboard[], int size); // shows the leaderboard, unrelated to entering names
         void display_final_score(int final_score); // shows final score
         bool is_score_in_leaderboard(int score);

@@ -538,7 +538,7 @@ void DisplayInterface::display_final_score(int final_score){
 
 bool DisplayInterface::is_score_in_leaderboard(int score){
     for (int i = 0; i < MAX_LEADERBOARD_ENTRIES; i++){
-        if (score = leaderboard[i].score){
+        if (score == leaderboard[i].score){
             return true;
         }
     }
@@ -546,7 +546,69 @@ bool DisplayInterface::is_score_in_leaderboard(int score){
     return false;
 }
 
-void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, int final_score, int fill_index, bool confirm); 
+void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, 
+    int final_score, uint8_t fill_index, bool confirm){
+
+    if (fill_index > 2){
+        fill_index = 2; // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
+    }
+
+    if (confirm){
+        // add name and score to leaderboard
+        String name = "";
+        name += first_letter;
+        name += second_letter;
+        name += third_letter;
+
+        add_to_leaderboard(name, final_score); // NEED A FUNCTION FOR THIS
+        return;
+    }
+
+    /*DRAW ENTRY SCREEN*/
+
+    oled.clearDisplay();
+    oled.setTextColor(SSD1306_WHITE);
+    oled.setTextSize(1);
+
+    // Top: hovered letter
+    oled.setCursor(0, 0);
+    oled.print("Select: ");
+    oled.print(hovered_letter);
+
+    // Score line
+    oled.setCursor(0, 10);
+    oled.print("Score: ");
+    oled.print(final_score);
+
+    // Instruction
+    oled.setCursor(0, 20);
+    oled.print("Press to confirm");
+
+    // Big letters (committed)
+    oled.setTextSize(3);
+
+    const int letters_y = 34;
+    const int letters_x_start = 18;
+    const int letters_spacing = 30;
+
+    oled.setCursor(letters_x_start, letters_y);
+    oled.write(first_letter);
+
+    oled.setCursor(letters_x_start + letters_spacing, letters_y);
+    oled.write(second_letter);
+
+    oled.setCursor(letters_x_start + 2 * letters_spacing, letters_y);
+    oled.write(third_letter);
+
+    // Underline cursor at current fill_index
+    const int underline_y = letters_y + 28;
+    int underline_at_letter = letters_x_start + (int) fill_index * letters_spacing;
+    oled.drawLine(underline_at_letter, underline_y, underline_at_letter + 18, underline_y, SSD1306_WHITE);
+
+    oled.display();
+
+
+} 
 
 
 
