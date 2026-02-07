@@ -16,6 +16,9 @@
 #define SCREEN_I2C_ADDRESS 0x3C
 #define OLED_RESET_PIN -1
 
+// Leaderboard
+#define FINAL_SCORE_DISPLAY_DURATION_MS 10000
+
 
 enum class Colour {
     Green,
@@ -108,11 +111,13 @@ class DisplayInterface {
         void idle_state();
 
         // oled display + leaderboard helper functions
-        void show_idle_oled_animation();
-        void update_oled_gameplay(int current_level, int current_round, int score); 
+        void show_idle_oled_animation(); // Show OLED idle animation
+        void update_oled_gameplay(int current_level, int current_round, int score); // Updates oled during the game play
         void prompt_leaderboard_name_entry(); 
-        void entering_names_to_leaderboard(char first_letter, char second_letter, char third_letter, int final_score, bool confirm); 
-        void show_leaderboard(const char* leaderboard[], int size);
+        void entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, int final_score, int fill_index, bool confirm); 
+        void show_leaderboard(const char* leaderboard[], int size); // shows the leaderboard, unrelated to entering names
+        void display_final_score(int final_score); // shows final score
+        bool is_score_in_leaderboard(int score);
         
     private:
         AnimationList animation_list; //Linked List
@@ -123,7 +128,7 @@ class DisplayInterface {
         unsigned short number_of_leds;
         unsigned short rings_data_pin;
         unsigned short hearts_data_pin;
-        unsigned short total_moles = 1;
+        unsigned short total_moles = 9;
         unsigned short total_lives = 3;
         CRGB* leds;
 
@@ -135,6 +140,21 @@ class DisplayInterface {
         // OLED Display
         Adafruit_SSD1306 oled = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET_PIN);
         bool oledReady = false;
+
+        // Leaderboard/ OLED
+        static const int MAX_LEADERBOARD_ENTRIES = 10;
+        static const int USERNAME_MAX_LENGTH = 16;
+        struct LeaderboardEntry {
+            char userame[USERNAME_MAX_LENGTH]; // 3 letters + null terminator
+            int score;
+        };
+        LeaderboardEntry leaderboard[MAX_LEADERBOARD_ENTRIES];
+        int leaderboardSize = 0;
+
+        bool final_score_active = false;
+        bool final_score_drawn = false;
+        int final_score_value = 0;
+        unsigned long final_score_end_time_ms = 0;
 
         //internal helper functions
         AnimationObject* queue_animation(

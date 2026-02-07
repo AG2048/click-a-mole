@@ -146,8 +146,6 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp){
     for (int i = animation_list.size() - 1; i >= 0 ; i--){
 
         AnimationObject* animation = animation_list.get(i);
-    
-    
 
         // hp bar
         if(animation->mole_id == mole_id && animation->led_type == LedType::Linear){
@@ -345,6 +343,32 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms){
 
     FastLED.show();
 
+
+    /* OLED FINAL SCORE */
+
+    if (final_score_active){
+        if (!final_score_drawn){
+            oled.clearDisplay();
+            oled.setTextSize(2);
+
+            oled.setTextColor(WHITE);
+            oled.setCursor(15,20);
+            oled.print("Score:");
+            oled.setCursor(50,40);
+            oled.print(final_score_value);
+            oled.display();
+            final_score_drawn = true;
+        }
+    }
+
+    if (current_time_ms >= final_score_end_time_ms){
+        final_score_active = false;
+        final_score_drawn = false;
+
+        // retrn to idle screen or clear
+        show_idle_oled_animation();
+    }
+
 }
 
 void DisplayInterface::win_game(){
@@ -503,6 +527,27 @@ void DisplayInterface::show_idle_oled_animation(){
 	oled.drawBitmap(x, y, diglett, 64, 64, SSD1306_WHITE);
     oled.display();
 }
+
+void DisplayInterface::display_final_score(int final_score){
+    final_score_active = true;
+    final_score_drawn = false;
+    final_score_value = final_score;
+
+    final_score_end_time_ms = millis() + FINAL_SCORE_DISPLAY_DURATION_MS;
+}
+
+bool DisplayInterface::is_score_in_leaderboard(int score){
+    for (int i = 0; i < MAX_LEADERBOARD_ENTRIES; i++){
+        if (score = leaderboard[i].score){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, int final_score, int fill_index, bool confirm); 
+
 
 
 // *************************************
