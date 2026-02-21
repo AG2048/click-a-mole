@@ -55,8 +55,8 @@ class MoleModule {
 
         volatile int dstVelocity = 1;
         int velocityCounter = 0;
-        int minVelocity = 5;
-        int maxVelocity = 2;
+        int minVelocity = 10;
+        int maxVelocity = 1;
         
         int targetAngle = 0;
         int currAngle = 0;

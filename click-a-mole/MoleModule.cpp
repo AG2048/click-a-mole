@@ -11,8 +11,8 @@ MoleModule::MoleModule(pin_t pulPin, pin_t dirPin, uint8_t buttonPin, uint8_t se
     pinMode(buttonPin, INPUT_PULLUP);
     lastButtonState = digitalRead(buttonPin);  
 
-    this->minVelocity = 5;
-    this->maxVelocity = 2;
+    this->minVelocity = 10;
+    this->maxVelocity = 1;
 
 }
 
@@ -62,7 +62,7 @@ void MoleModule::update(TCA9548A& mux) {
 
 
     // Compute motor dir and motor steps from curr and target angle
-    float error = targetAngle - currAngle;
+    float error = targetAngle - currAngle - 90;
     
     // Correct error for wrap around
     if (error > 180.0) error -= 360.0;
@@ -86,6 +86,7 @@ void MoleModule::update(TCA9548A& mux) {
     // return;
     // calculate dstVelocity
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { dstVelocity = minVelocity + (maxVelocity - minVelocity) / TOTAL_DEGREES_PER_ROLL * error; }
+    // ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { dstVelocity = maxVelocity + (minVelocity - maxVelocity) / TOTAL_DEGREES_PER_ROLL * fabs(error); }
     
 }
 
