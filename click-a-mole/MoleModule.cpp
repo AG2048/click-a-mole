@@ -57,8 +57,10 @@ void MoleModule::update(TCA9548A& mux) {
     currAngle = sensor.readAngle();
     mux.closeChannel(sensorID);
 
-    // Serial.print("Angle: ");
-    // Serial.println(currAngle);
+    Serial.print("Angle ");
+    Serial.print(sensorID);
+    Serial.print(": ");
+    Serial.println(currAngle);
 
 
     // Compute motor dir and motor steps from curr and target angle

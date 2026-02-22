@@ -16,7 +16,7 @@ char getInput()
         return Serial.read(); // return that key
     }
     else
-    {
+    {  
         return '\0'; // default: no key pressed
     }
 
