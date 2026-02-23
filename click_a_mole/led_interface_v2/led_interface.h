@@ -18,6 +18,7 @@
 
 // Leaderboard
 #define FINAL_SCORE_DISPLAY_DURATION_MS 10000
+#define NAME_LENGTH 3
 
 
 enum class Colour {
@@ -118,6 +119,10 @@ class DisplayInterface {
         void show_leaderboard(const char* leaderboard[], int size); // shows the leaderboard, unrelated to entering names
         void display_final_score(int final_score); // shows final score
         bool is_score_in_leaderboard(int score);
+
+        void begin_leaderboard_entry(int final_score);
+        bool update_leaderboard_entry(int encoder_A_reading, int encoder_B_reading, bool button_pressed);
+
         
     private:
         AnimationList animation_list; //Linked List
@@ -155,6 +160,16 @@ class DisplayInterface {
         bool final_score_drawn = false;
         int final_score_value = 0;
         unsigned long final_score_end_time_ms = 0;
+
+        int     entry_hovered_index = 0;          // 0–25 → 'A'–'Z'
+        uint8_t entry_fill_index    = 0;          // 0, 1, or 2
+        char    entry_letters[NAME_LENGTH + 1];   // committed chars + '\0'
+        int     entry_score         = 0;
+        int     entry_prev_A_state  = LOW;
+
+        void redraw_entry_oled();                               // thin wrapper around entering_names_to_leaderboard
+        void add_to_leaderboard(const String& name, int score); // was called in entering_names_to_leaderboard but never defined
+
 
         //internal helper functions
         AnimationObject* queue_animation(

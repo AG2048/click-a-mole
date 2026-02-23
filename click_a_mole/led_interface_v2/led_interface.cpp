@@ -102,7 +102,7 @@ DisplayInterface::DisplayInterface(
 
     fill_solid(leds, number_of_leds_, CRGB::Black);
 
-    Wire.begin();
+    //Wire.begin();
 
 }
 
@@ -549,8 +549,8 @@ bool DisplayInterface::is_score_in_leaderboard(int score){
 void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, 
     int final_score, uint8_t fill_index, bool confirm){
 
-    if (fill_index > 2){
-        fill_index = 2; // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
+    if (fill_index > NAME_LENGTH - 1){
+        fill_index = NAME_LENGTH - 1; // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
     }
 
     if (confirm){
@@ -609,6 +609,138 @@ void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char f
 
 
 } 
+
+// ── Public: call once when transitioning into name-entry mode ───
+void DisplayInterface::begin_leaderboard_entry(int final_score) {
+    entry_hovered_index = 0;
+    entry_fill_index    = 0;
+    entry_score         = final_score;
+
+    // Pre-fill slots with '_' so the OLED always shows 3 characters.
+    for (int i = 0; i < NAME_LENGTH; i++) {
+        entry_letters[i] = '_';
+    }
+    entry_letters[NAME_LENGTH] = '\0';
+
+    entry_prev_A_state = LOW; // will sync on the first update call
+
+    redraw_entry_oled();
+}
+
+
+// PUBLIC: Returns true once the 3rd letter is confirmed and saved.
+bool DisplayInterface::update_leaderboard_entry(int encoder_A_reading, int encoder_B_reading, bool button_pressed) {
+
+    // ROTARY ENCODER
+    if (encoder_A_reading != entry_prev_A_state) {
+
+        if (encoder_B_reading != encoder_A_reading) {
+            // Clockwise
+            if (entry_hovered_index == 25) {
+                entry_hovered_index = 0;
+            } else {
+                entry_hovered_index++;
+            }
+        } else {
+            // Counter-clockwise
+            if (entry_hovered_index == 0) {
+                entry_hovered_index = 25;
+            } else {
+                entry_hovered_index--;
+            }
+        }
+
+        entry_prev_A_state = encoder_A_reading;
+        redraw_entry_oled();
+    }
+
+    // BUTTON
+    if (button_pressed) {
+        char chosen = (char)('A' + entry_hovered_index);
+        entry_letters[entry_fill_index] = chosen;
+
+        if (entry_fill_index < 2) {
+            // Move cursor to next slot
+            entry_fill_index++;
+            redraw_entry_oled();
+        } else {
+            // Third press — save and signal done.
+            String name = "";
+            name += entry_letters[0];
+            name += entry_letters[1];
+            name += entry_letters[2];
+
+            add_to_leaderboard(name, entry_score);
+
+            // Brief confirmation on the OLED.
+            oled.clearDisplay();
+            oled.setTextSize(2);
+            oled.setTextColor(SSD1306_WHITE);
+            oled.setCursor(10, 20);
+            oled.print("Saved!");
+            oled.setCursor(10, 44);
+            oled.print(name);
+            oled.print(" ");
+            oled.print(entry_score);
+            oled.display();
+
+            return true; // caller should leave name-entry state
+        }
+    }
+
+    return false;
+}
+
+// PRIVATE: redraws the OLED entry screen
+void DisplayInterface::redraw_entry_oled() {
+    char hovered_letter = (char)('A' + entry_hovered_index);
+
+    entering_names_to_leaderboard(
+        hovered_letter,
+        entry_letters[0],
+        entry_letters[1],
+        entry_letters[2],
+        entry_score,
+        entry_fill_index,
+        false
+    );
+}
+
+// PRIVATE: insertion-sort add into leaderboard array, just add to the leaderboard, doesn't display anything
+void DisplayInterface::add_to_leaderboard(const String& name, int score) {
+
+    LeaderboardEntry new_entry;
+    strncpy(new_entry.userame, name.c_str(), USERNAME_MAX_LENGTH - 1);
+    new_entry.userame[USERNAME_MAX_LENGTH - 1] = '\0';
+    new_entry.score = score;
+
+    if (leaderboardSize < MAX_LEADERBOARD_ENTRIES) {
+        leaderboard[leaderboardSize] = new_entry;
+        leaderboardSize++;
+    } else {
+        // Board full — only replace the lowest score if the new one is better.
+        int lowest_idx = 0;
+        for (int i = 1; i < leaderboardSize; i++) {
+            if (leaderboard[i].score < leaderboard[lowest_idx].score) {
+                lowest_idx = i;
+            }
+        }
+        if (score <= leaderboard[lowest_idx].score) return;
+        leaderboard[lowest_idx] = new_entry;
+    }
+
+    // Keep the array sorted descending by score.
+    for (int i = leaderboardSize - 1; i > 0; i--) {
+        if (leaderboard[i].score > leaderboard[i - 1].score) {
+            LeaderboardEntry tmp   = leaderboard[i];
+            leaderboard[i]         = leaderboard[i - 1];
+            leaderboard[i - 1]     = tmp;
+        } else {
+            break;
+        }
+    }
+}
+
 
 
 
