@@ -11,11 +11,12 @@ GameLogic *game = nullptr;
 void setup()
 {
     Serial.begin(9600);
-    p_di = new DisplayInterface; // Placeholder, replace with actual DisplayInterface object
-    p_mi = new MoleController;   // Placeholder, replace with actual MotorInterface
+    p_di = new DisplayInterface; 
+    p_mi = new MoleController;  
     game = new GameLogic(p_di, p_mi);
     p_mi->init();
-
+    p_di->begin();
+    
     p_mi->addModule(
         new MoleModule(
             {22, &PORTA, (1 << PA0)}, // pul
@@ -99,6 +100,7 @@ void loop()
 {
     uint32_t gameLoopStartTime = micros();
     game->fsm();
+    p_di->process_timed_animations(millis());
     uint32_t gameLoopEndTime = micros();
     // Serial.println(gameLoopEndTime - gameLoopStartTime);
 }

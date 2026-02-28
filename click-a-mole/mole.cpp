@@ -41,10 +41,6 @@ int Mole::getHP() const
 
 void Mole::setPosition(bool alive, DisplayInterface *p_di)
 {
-    if (alive)
-    {
-        p_di->startMole(ID, HP, duration); // Should be default colour mode that will be applied
-    }
     // takes a boolean argument to set the position of the mole
     // expected output: if up is true, mole is set to up (visible); if false, mole is set to down (not visible)
     isAlive = alive;
@@ -73,7 +69,7 @@ void Mole::handleDeath(GameLogic *game)
     // set mole position to down
     game->setScore(game->getScore() + 1);
     // increment player's score by 1
-    game->getDisplayInterface()->endMole(ID, false, true); // notify display that mole ended due to HP reaching 0
+    game->getDisplayInterface()->end_mole(ID, false, true); // notify display that mole ended due to HP reaching 0
     // // Serial.print("Mole ");
     // // Serial.print(ID);
     // // Serial.println(" has died. Going back down and incrementing score.");
@@ -96,12 +92,18 @@ void Mole::handleTimeIsUp(GameLogic *game)
     // expected output: mole goes back down (isAlive = false) and player's lives decrements by 1
     setPosition(false, game->getDisplayInterface()); // set mole position to down
     if (game->getLives() > 0)
-        game->setLives(game->getLives() - 1); // decrement player's lives by 1
+    {
+        game->setLives(game->getLives() - 1);                        // decrement player's lives by 1
+        game->getDisplayInterface()->update_heart(game->getLives()); // update heart display
+    }
     else
+    {
         game->setLives(0);
+        game->getDisplayInterface()->update_heart(game->getLives());
+    }
+
     // ensure lives do not go negative
-    game->getDisplayInterface()->endMole(ID, true, false); // notify display that mole ended due to timeout
-    game->getDisplayInterface()->update_heart(game->getLives());
+    game->getDisplayInterface()->end_mole(ID, true, false); // notify display that mole ended due to timeout
     timeIsUp = false;
     // // Serial.print("Mole ");
     // // Serial.print(ID);
@@ -123,7 +125,7 @@ void Mole::decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di, MoleCont
         return;
     }
     HP -= delta_to_decrease_by;
-    p_di->changeMoleHP(ID, HP, maxHP); // assuming max HP is 3
+    p_di->change_mole_hp(ID, HP, maxHP); // assuming max HP is 3
     p_mi->setHp(ID, HP, maxHP);
     if (HP < 0)
         HP = 0; // Ensure HP doesn't go negative
@@ -151,7 +153,7 @@ void Mole::increaseHp(int delta_to_increase_by, DisplayInterface *p_di)
         return;
     }
     HP += delta_to_increase_by;
-    p_di->changeMoleHP(ID, HP, 3); // assuming max HP is 3
+    p_di->change_mole_hp(ID, HP, maxHP); // assuming max HP is 3
     if (HP >= maxHP)
         HP = maxHP; // Ensure HP doesn't go over max
     // // Serial.print("Mole's HP increased by ");

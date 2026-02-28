@@ -214,6 +214,9 @@ void GameLogic::fsm()
         // implement a start button
         // Serial.println("Game is in IDLE state. Waiting to start...");
         // Serial.println("Press 's' to start the game.");
+        p_di->turn_off_score(); // turn off score display
+        p_di->idle_state();     // display idle animation on LEDs and OLED
+        p_di->show_idle_oled_animation();
         char c = getInput();
         if (c == 's')
         {
@@ -234,6 +237,7 @@ void GameLogic::fsm()
         }
         Serial.print(F("Game initialized. Starting first round."));
         nextGameState = S_INITIALIZE_ROUND;
+        p_di->game_start(); // display game start animation
     }
     else if (currentGameState == S_INITIALIZE_ROUND)
     {
@@ -255,12 +259,9 @@ void GameLogic::fsm()
         // // Serial.print("Round Time: " + String(int((millis() - startRound) / 1000)) + " seconds");
         // // Serial.print("Mole lifetime ≈ " + String(minDurationForLevel(level) / 1000.0) + "-" + String(maxDurationForLevel(level) / 1000.0) + " seconds");
         p_mi->updateAll();
-
         p_mi->readButtons(buttonStates);
-        p_di->show_score(score); // update score display
-
-        
-
+        p_di->show_score(score);                                                               // update score display
+        p_di->update_oled_gameplay(level, (numMolesDownThisRound / roundMaxMoles) + 1, score); // update OLED display with current level, round, and score
         unsigned long now = millis();
         int idx = rand() % 8;
         Mole *m = moleArr[idx];
@@ -275,14 +276,16 @@ void GameLogic::fsm()
             now - m->getLastDownTime() >= MOLE_RESPAWN_COOLDOWN_MS)
         {
             delete m;                   // free existing mole
-            int spawnType = rand() % 1; // CHANGE: rand() % 2
+            int spawnType = rand() % 2; // CHANGE: rand() % 2
             if (spawnType == 0)
             {
                 m = new Black(0);
+                p_di->start_mole(idx, m->maxHP, m->duration, Colour::Black);
             }
             else
             {
                 m = new White(0);
+                p_di->start_mole(idx, m->maxHP, m->duration, Colour::HealerMole);
             }
             unsigned long minDur = minDurationForLevel(level);
             unsigned long maxDur = maxDurationForLevel(level);
@@ -349,30 +352,46 @@ void GameLogic::fsm()
                 moles_interface[i] = '\0'; // Mole is Down
             }
         }
-    //     Serial.println(F("----------------------------"));
-    // Serial.println(F("Moles Interface State:"));
+        //     Serial.println(F("----------------------------"));
+        // Serial.println(F("Moles Interface State:"));
 
-    // // Row 1
-    Serial.print(F("[")); Serial.print(moles_interface[0]); Serial.print(F("]"));
-    Serial.print(F("[")); Serial.print(moles_interface[1]); Serial.print(F("]"));
-    Serial.print(F("[")); Serial.print(moles_interface[2]); Serial.println(F("]"));
+        // // Row 1
+        Serial.print(F("["));
+        Serial.print(moles_interface[0]);
+        Serial.print(F("]"));
+        Serial.print(F("["));
+        Serial.print(moles_interface[1]);
+        Serial.print(F("]"));
+        Serial.print(F("["));
+        Serial.print(moles_interface[2]);
+        Serial.println(F("]"));
 
-    // // // Row 2
-    Serial.print(F("[")); Serial.print(moles_interface[3]); Serial.print(F("]"));
-    Serial.print(F("[")); Serial.print(moles_interface[4]); Serial.print(F("]"));
-    Serial.print(F("[")); Serial.print(moles_interface[5]); Serial.println(F("]"));
+        // // // Row 2
+        Serial.print(F("["));
+        Serial.print(moles_interface[3]);
+        Serial.print(F("]"));
+        Serial.print(F("["));
+        Serial.print(moles_interface[4]);
+        Serial.print(F("]"));
+        Serial.print(F("["));
+        Serial.print(moles_interface[5]);
+        Serial.println(F("]"));
 
-    // // // Row 3
-    Serial.print(F("[")); Serial.print(moles_interface[6]); Serial.print(F("]"));
-    Serial.print(F("[")); Serial.print(moles_interface[7]); Serial.print(F("]"));
+        // // // Row 3
+        Serial.print(F("["));
+        Serial.print(moles_interface[6]);
+        Serial.print(F("]"));
+        Serial.print(F("["));
+        Serial.print(moles_interface[7]);
+        Serial.print(F("]"));
 
-    // Status Info
-    Serial.print(F("Number of Lives: "));
-    Serial.println(lives);
+        // Status Info
+        Serial.print(F("Number of Lives: "));
+        Serial.println(lives);
 
-    Serial.print(F("Number of Moles Left: "));
-    Serial.println(roundMaxMoles - numMolesDownThisRound);
-    Serial.println(); // Extra newline for spacing
+        Serial.print(F("Number of Moles Left: "));
+        Serial.println(roundMaxMoles - numMolesDownThisRound);
+        Serial.println(); // Extra newline for spacing
 
         if (gameEnded())
         {
@@ -390,12 +409,23 @@ void GameLogic::fsm()
     else if (currentGameState == S_INBETWEENLEVELS)
     {
         // Handle in-between levels state
+        if (level % 5 == 0)
+        {
+            p_di->win_game(); // display win game animation every 5 levels
+        }
+        else
+        {
+            p_di->win_round(); // display win round animation
+        }
         level++;
         nextGameState = S_INITIALIZE_ROUND;
     }
     else if (currentGameState == S_GAMEOVER)
     {
-        p_mi->resetHp(); // TO DO + loop over moles to reset hp and position
+        p_di->lose_game();                // display lose game animation
+        p_di->display_final_score(score); // display final score on OLED
+        p_di->game_over("LOSE");          // display game over animation
+        p_mi->resetHp();                  // TO DO + loop over moles to reset hp and position
         // Handle game over state
         // print game over
         // Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -418,6 +448,13 @@ void GameLogic::fsm()
 
         // // display line on the leaderboard
         // // Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
+
+        p_di->prompt_leaderboard_name_entry();                                    // prompt player to enter name for leaderboard
+        p_di->show_leaderboard(nullptr, 0);                                       // display leaderboard (placeholder with empty leaderboard)
+        p_di->display_final_score(score);                                         // display final score on OLED
+        p_di->is_score_in_leaderboard(score);                                     // check if score is in leaderboard and display accordingly
+        p_di->entering_names_to_leaderboard('A', 'A', 'A', 'A', score, 0, false); // placeholder for entering names to leaderboard
+
         nextGameState = S_IDLE;
     }
     else
