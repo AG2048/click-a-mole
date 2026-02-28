@@ -10,8 +10,16 @@ GameLogic *game = nullptr;
 
 void setup()
 {
+    /*
+    unsigned short leds_per_ring,
+        unsigned short leds_per_linear,
+        unsigned short leds_per_mole_indicator,
+        unsigned short leds_per_heart,
+        unsigned short number_of_leds,
+        unsigned short rings_data_pin,
+        unsigned short hearts_data_pin */
     Serial.begin(9600);
-    p_di = new DisplayInterface; 
+    p_di = new DisplayInterface( 0, 0, 0, 0, 0, 0, 0); 
     p_mi = new MoleController;  
     game = new GameLogic(p_di, p_mi);
     p_mi->init();

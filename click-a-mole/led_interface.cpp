@@ -604,7 +604,7 @@ void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char f
         name += second_letter;
         name += third_letter;
 
-        add_to_leaderboard(name, final_score); // NEED A FUNCTION FOR THIS
+        // add_to_leaderboard(name, final_score); // NEED A FUNCTION FOR THIS
         return;
     }
 

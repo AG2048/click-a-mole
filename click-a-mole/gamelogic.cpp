@@ -280,12 +280,10 @@ void GameLogic::fsm()
             if (spawnType == 0)
             {
                 m = new Black(0);
-                p_di->start_mole(idx, m->maxHP, m->duration, Colour::Black);
             }
             else
             {
                 m = new White(0);
-                p_di->start_mole(idx, m->maxHP, m->duration, Colour::HealerMole);
             }
             unsigned long minDur = minDurationForLevel(level);
             unsigned long maxDur = maxDurationForLevel(level);
@@ -305,6 +303,8 @@ void GameLogic::fsm()
             m->setHP(hp);
             p_mi->setHp(0, hp, hp);
             m->setPosition(true, p_di); // set mole to up position
+
+            p_di->start_mole(idx, hp, lifetime, m->getColour());
             currNumMolesUp++;
             lastSpawnTime = now;
             nextSpawnDelay = randomSpawnDelayForLevel(level);
@@ -449,8 +449,6 @@ void GameLogic::fsm()
         // // display line on the leaderboard
         // // Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
 
-        p_di->prompt_leaderboard_name_entry();                                    // prompt player to enter name for leaderboard
-        p_di->show_leaderboard(nullptr, 0);                                       // display leaderboard (placeholder with empty leaderboard)
         p_di->display_final_score(score);                                         // display final score on OLED
         p_di->is_score_in_leaderboard(score);                                     // check if score is in leaderboard and display accordingly
         p_di->entering_names_to_leaderboard('A', 'A', 'A', 'A', score, 0, false); // placeholder for entering names to leaderboard

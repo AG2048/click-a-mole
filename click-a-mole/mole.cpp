@@ -3,9 +3,15 @@
 #include "led_interface.h"
 #include <Arduino.h>
 #include "MoleController.h"
+
 void Mole::setLastDownTime(unsigned long time)
 {
     lastDownTime = time;
+}
+
+void Mole::setColour(Colour colour)
+{
+    this->colour = colour;
 }
 
 unsigned long Mole::getLastDownTime() const
@@ -174,6 +180,7 @@ Mole::Mole(int ID)
     currenttime = 0;
     duration = 5000; // default duration 5 seconds
     lastDownTime = 0;
+    colour = Colour::NormalMole; // default colour
 }
 
 void Mole::getCurrentTime()
@@ -253,4 +260,9 @@ void White::update(GameLogic *game)
             moles[i]->increaseHp(1, game->getDisplayInterface());
         }
     }
+}
+
+Colour Mole::getColour() const
+{
+    return colour;
 }
