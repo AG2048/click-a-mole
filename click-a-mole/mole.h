@@ -45,19 +45,41 @@ public:
     void setMaxHP(int max_hp);
     void setColour(Colour colour);
     Colour getColour() const;
+    void advanceStartTime(unsigned long dt); // pushes startime forward to pause the countdown, simulating a freeze
 };
 
-class Black : public Mole
+class Black : public Mole // NORMAL
 {
 public:
-    Black(int ID) : Mole(ID) {};
+    Black(int ID) : Mole(ID) { colour = Colour::NormalMole; };
     void update(GameLogic *game);
 };
 
-class White : public Mole
+class White : public Mole // DOCTOR
 {
 public:
-    White(int ID) : Mole(ID) {};
+    White(int ID) : Mole(ID) { colour = Colour::HealerMole; };
+    void update(GameLogic *game);
+};
+
+class Gold : public Mole // BONUS
+{
+public:
+    Gold(int ID) : Mole(ID) { colour = Colour::Yellow; };
+    void update(GameLogic *game);
+};
+
+class Red : public Mole // BOMB
+{
+public:
+    Red(int ID) : Mole(ID) { colour = Colour::Red; };
+    void update(GameLogic *game);
+};
+
+class Blue : public Mole // FREEZE
+{
+public:
+    Blue(int ID) : Mole(ID) { colour = Colour::Blue; };
     void update(GameLogic *game);
 };
 

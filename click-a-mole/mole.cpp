@@ -4,6 +4,11 @@
 #include <Arduino.h>
 #include "MoleController.h"
 
+void Mole::advanceStartTime(unsigned long dt)
+{
+    startime += dt; // offsetting startime forward by dt means (currenttime - startime) doesn't grow
+}
+
 void Mole::setLastDownTime(unsigned long time)
 {
     lastDownTime = time;
@@ -180,7 +185,7 @@ Mole::Mole(int ID)
     currenttime = 0;
     duration = 5000; // default duration 5 seconds
     lastDownTime = 0;
-    colour = Colour::NormalMole; // default colour
+    lastHealTime = 0;
 }
 
 void Mole::getCurrentTime()
@@ -252,7 +257,7 @@ void White::update(GameLogic *game)
             return; // only heal after 1 second has passed since coming up
         }
         lastHealTime = now; // reset healtime for next heal interval
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < TOTAL_MOLES; i++)
         {
             // increase HP checks if mole is up
             // if it's up, increases HP by 1
@@ -265,4 +270,65 @@ void White::update(GameLogic *game)
 Colour Mole::getColour() const
 {
     return colour;
+}
+
+void Gold::update(GameLogic *game)
+{
+    getCurrentTime();
+    checkIfTimeIsUp();
+    if (getTimeIsUp() && getPosition())
+    {
+        handleTimeIsUp(game);
+    }
+    else if (HP <= 0 && getPosition())
+    {
+        // Gold mole killed: award 5x points instead of the normal 1
+        setPosition(false, game->getDisplayInterface());
+        game->setScore(game->getScore() + 5);
+        game->getDisplayInterface()->end_mole(ID, false, true);
+        lastDownTime = millis();
+    }
+}
+
+void Red::update(GameLogic *game)
+{
+    getCurrentTime();
+    checkIfTimeIsUp();
+    if (getTimeIsUp() && getPosition())
+    {
+        handleTimeIsUp(game); // timed out naturally: lose 1 life, same as any mole
+    }
+    else if (HP <= 0 && getPosition())
+    {
+        // Bomb mole clicked: lose 1 life, no points awarded
+        setPosition(false, game->getDisplayInterface());
+        if (game->getLives() > 0)
+        {
+            game->setLives(game->getLives() - 1);
+            game->getDisplayInterface()->update_heart(game->getLives());
+        }
+        else
+        {
+            game->setLives(0);
+            game->getDisplayInterface()->update_heart(0);
+        }
+        game->getDisplayInterface()->end_mole(ID, false, true);
+        lastDownTime = millis();
+    }
+}
+
+void Blue::update(GameLogic *game)
+{
+    getCurrentTime();
+    checkIfTimeIsUp();
+    if (getTimeIsUp() && getPosition())
+    {
+        handleTimeIsUp(game);
+    }
+    else if (HP <= 0 && getPosition())
+    {
+        // Freeze mole killed: award a point and freeze all active moles for 3 seconds
+        handleDeath(game);
+        game->setFreezeUntil(millis() + 3000);
+    }
 }

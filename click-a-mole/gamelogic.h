@@ -1,6 +1,7 @@
 #include "mole.h"
 #ifndef GAMELOGIC_H
 #define GAMELOGIC_H
+#define TOTAL_MOLES 8 // CHANGE: TOTAL_MOLES 3
 
 enum GameState
 {
@@ -37,7 +38,8 @@ private:
     GameState nextGameState;
     DisplayInterface *p_di;
     MoleController *p_mi;
-
+    unsigned long freezeUntil;  // millis() timestamp when the freeze effect expires
+    unsigned long lastTickTime; // timestamp of the previous fsm() tick, to check if still frozen
 public:
     void handleInput(char c);                                // process user input character
     GameLogic(DisplayInterface *p_di, MoleController *p_mi); // constructor to initialize game with number of moles and initial lives
@@ -51,5 +53,7 @@ public:
     void setScore(int s);
     void setLives(int l);
     Mole **getMoleArr() const;
+    void setFreezeUntil(unsigned long t); // both this and the get function handle the freezing logic
+    unsigned long getFreezeUntil() const;
 };
 #endif // GAMELOGIC_H

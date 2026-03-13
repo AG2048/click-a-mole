@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/antoinetabet/Developer/click-a-mole/gamelogic2",
-      "program": "/Users/antoinetabet/Developer/click-a-mole/gamelogic2/build/Debug/outDebug"
+      "cwd": "/Users/antoinetabet/Developer/click-a-mole/click-a-mole",
+      "program": "/Users/antoinetabet/Developer/click-a-mole/click-a-mole/build/Debug/outDebug"
     }
   ]
 }

@@ -4,9 +4,18 @@
 #include "MoleController.h"
 #include "difficulty.h"
 #include <Arduino.h>
-#include <stdlib.h>   // for rand() and srand()
-#define TOTAL_MOLES 8 // CHANGE: TOTAL_MOLES 3
+#include <stdlib.h> // for rand() and srand()
 #define MAX_LIVES 3
+
+void GameLogic::setFreezeUntil(unsigned long t)
+{
+    freezeUntil = t;
+}
+
+unsigned long GameLogic::getFreezeUntil() const
+{
+    return freezeUntil;
+}
 
 char getInput()
 {
@@ -175,6 +184,8 @@ GameLogic::GameLogic(DisplayInterface *p_di, MoleController *p_mi)
     lastSpawnTime = 0;
     nextSpawnDelay = 0;
     startRound = 0;
+    freezeUntil = 0;
+    lastTickTime = 0;
 }
 
 DisplayInterface *GameLogic::getDisplayInterface() const
@@ -258,6 +269,28 @@ void GameLogic::fsm()
         // // Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         // // Serial.print("Round Time: " + String(int((millis() - startRound) / 1000)) + " seconds");
         // // Serial.print("Mole lifetime ≈ " + String(minDurationForLevel(level) / 1000.0) + "-" + String(maxDurationForLevel(level) / 1000.0) + " seconds");
+
+        // CHECK FREEZE
+        // Compute how much real time passed since last tick
+        unsigned long tickNow = millis();
+        unsigned long dt = tickNow - lastTickTime;
+        lastTickTime = tickNow;
+
+        // If the freeze is active, push every live mole's startime forward by dt
+        // so their internal countdown doesn't advance during the freeze window
+        // advancing start time instead of freezing countdown allows better integration with LEDs
+        if (freezeUntil > 0 && tickNow < freezeUntil)
+        {
+            for (int i = 0; i < TOTAL_MOLES; i++)
+            {
+                if (moleArr[i]->getPosition())
+                {
+                    moleArr[i]->advanceStartTime(dt);
+                }
+            }
+        }
+        // END CHECK FREEZE
+
         p_mi->updateAll();
         p_mi->readButtons(buttonStates);
         p_di->show_score(score);                                                               // update score display
@@ -275,16 +308,29 @@ void GameLogic::fsm()
             m->getPosition() == false &&
             now - m->getLastDownTime() >= MOLE_RESPAWN_COOLDOWN_MS)
         {
-            delete m;                   // free existing mole
-            int spawnType = rand() % 2; // CHANGE: rand() % 2
+            delete m; // free existing mole
+            int spawnType = rand() % 5;
             if (spawnType == 0)
             {
-                m = new Black(0);
+                m = new Black(idx);
+            }
+            else if (spawnType == 1)
+            {
+                m = new White(idx);
+            }
+            else if (spawnType == 2)
+            {
+                m = new Red(idx);
+            }
+            else if (spawnType == 3)
+            {
+                m = new Gold(idx);
             }
             else
             {
-                m = new White(0);
+                m = new Blue(idx);
             }
+
             unsigned long minDur = minDurationForLevel(level);
             unsigned long maxDur = maxDurationForLevel(level);
             if (minDur > maxDur)
