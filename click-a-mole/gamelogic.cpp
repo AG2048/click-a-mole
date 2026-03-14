@@ -494,10 +494,12 @@ void GameLogic::fsm()
 
         // // display line on the leaderboard
         // // Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
-
-        p_di->display_final_score(score);                                         // display final score on OLED
-        p_di->is_score_in_leaderboard(score);                                     // check if score is in leaderboard and display accordingly
-        p_di->entering_names_to_leaderboard('A', 'A', 'A', 'A', score, 0, false); // placeholder for entering names to leaderboard
+        p_di->begin_leaderboard_entry();             // display leaderboard entry animation
+        p_di->update_leaderboard_entry(0, 0, false); // placeholder for updating leaderboard entry with encoder input
+        p_di->show_leaderboard();                    // display leaderboard
+        p_di->prompt_leaderboard_name_entry();       // prompt player to enter name for leaderboard
+        p_di->display_final_score(score);            // display final score on OLED
+        p_di->is_score_in_leaderboard(score);        // check if score is in leaderboard and display accordingly
 
         nextGameState = S_IDLE;
     }

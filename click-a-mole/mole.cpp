@@ -136,7 +136,7 @@ void Mole::decreaseHp(int delta_to_decrease_by, DisplayInterface *p_di, MoleCont
         return;
     }
     HP -= delta_to_decrease_by;
-    p_di->change_mole_hp(ID, HP, maxHP); // assuming max HP is 3
+    p_di->decrease_mole_hp(ID, HP, maxHP); // assuming max HP is 3
     p_mi->setHp(ID, HP, maxHP);
     if (HP < 0)
         HP = 0; // Ensure HP doesn't go negative
@@ -164,7 +164,7 @@ void Mole::increaseHp(int delta_to_increase_by, DisplayInterface *p_di)
         return;
     }
     HP += delta_to_increase_by;
-    p_di->change_mole_hp(ID, HP, maxHP); // assuming max HP is 3
+    p_di->increase_mole_hp(ID, HP, maxHP); // assuming max HP is 3
     if (HP >= maxHP)
         HP = maxHP; // Ensure HP doesn't go over max
     // // Serial.print("Mole's HP increased by ");

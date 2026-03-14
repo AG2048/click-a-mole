@@ -98,7 +98,7 @@ DisplayInterface::DisplayInterface(
 
     fill_solid(leds, number_of_leds_, CRGB::Black);
 
-    Wire.begin();
+    // Wire.begin();
 }
 
 // Destructor
@@ -134,7 +134,7 @@ void DisplayInterface::start_mole(int mole_id, int max_hp, unsigned long duratio
 // on the ring timer to reflect that the mole was pressed,
 // immediately returns to timer animation after flash animation is done
 // NOTE: The timer doesn't pause during flash animation
-void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp)
+void DisplayInterface::decrease_mole_hp(int mole_id, int new_hp, int max_hp)
 {
     unsigned long current_time_ms = millis();
 
@@ -213,6 +213,25 @@ void DisplayInterface::change_mole_hp(int mole_id, int new_hp, int max_hp)
     }
 }
 
+// Function increases hp bar for a mole
+// Only hp bar changes and goes to the new hp
+void DisplayInterface::increase_mole_hp(int mole_id, int new_hp, int max_hp)
+{
+    unsigned long current_time_ms = millis();
+
+    for (int i = animation_list.size() - 1; i >= 0; i--)
+    {
+
+        AnimationObject *animation = animation_list.get(i);
+
+        // hp bar
+        if (animation->mole_id == mole_id && animation->led_type == LedType::Linear)
+        {
+            animation->current_hp = new_hp;
+        }
+    }
+}
+
 // Function plays a blinking animation on the ring and linear leds
 // (of a specific mole)  if the timer ran out or the mole's hp is 0
 void DisplayInterface::end_mole(int mole_id, bool is_timeout, bool is_hp_zero)
@@ -252,43 +271,43 @@ void DisplayInterface::win_round()
         remove_mole_animation(i);
     }
 
+    // light first row
     AnimationObject *firstRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 1, start_time_ms, 667, -1, -1, nullptr, Colour::Green);
     queue_animation(LedType::Ring, AnimationCategory::Solid, 2, start_time_ms, 667, -1, -1, nullptr, Colour::Green);
     queue_animation(LedType::Ring, AnimationCategory::Solid, 3, start_time_ms, 667, -1, -1, nullptr, Colour::Green);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 4, start_time_ms, 667, -1, -1, nullptr, Colour::Green);
 
-    AnimationObject *secondRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 5, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 6, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 7, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
+    // light second row
+    AnimationObject *secondRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 4, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
+    queue_animation(LedType::Ring, AnimationCategory::Solid, 5, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
 
+    // light thrid row
+    queue_animation(LedType::Ring, AnimationCategory::Solid, 7, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
     queue_animation(LedType::Ring, AnimationCategory::Solid, 8, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
     queue_animation(LedType::Ring, AnimationCategory::Solid, 9, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
 }
 
 // Function removes all mole animations
 // and plays lose win animation for 2001m (divisble by 3), then sets all mole leds to black
-void DisplayInterface::lose_round()
-{
+// void DisplayInterface::lose_round() {
 
-    unsigned long start_time_ms = millis();
+//   unsigned long start_time_ms = millis();
 
-    for (int i = 1; i <= total_moles; i++)
-    {
-        remove_mole_animation(i);
-    }
+//   for (int i = 1; i <= total_moles; i++) {
+//     remove_mole_animation(i);
+//   }
 
-    AnimationObject *firstRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 1, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 2, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 3, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 4, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   AnimationObject* firstRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 1, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   queue_animation(LedType::Ring, AnimationCategory::Solid, 2, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   queue_animation(LedType::Ring, AnimationCategory::Solid, 3, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   queue_animation(LedType::Ring, AnimationCategory::Solid, 4, start_time_ms, 667, -1, -1, nullptr, Colour::Red);
 
-    AnimationObject *secondRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 5, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 6, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 7, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   AnimationObject* secondRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 5, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   queue_animation(LedType::Ring, AnimationCategory::Solid, 6, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   queue_animation(LedType::Ring, AnimationCategory::Solid, 7, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
 
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 8, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
-    queue_animation(LedType::Ring, AnimationCategory::Solid, 9, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
-}
+//   queue_animation(LedType::Ring, AnimationCategory::Solid, 8, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+//   queue_animation(LedType::Ring, AnimationCategory::Solid, 9, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Red);
+// }
 
 // Function shows the number of lives the
 // player has on the heart led display
@@ -383,6 +402,13 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms)
         // retrn to idle screen or clear
         show_idle_oled_animation();
     }
+
+    // QR CODE DISPLAY TIMEOUT
+    if (qr_active && current_time_ms >= qr_end_time_ms)
+    {
+        qr_active = false;
+        show_idle_oled_animation();
+    }
 }
 
 void DisplayInterface::win_game()
@@ -394,9 +420,9 @@ void DisplayInterface::win_game()
         remove_mole_animation(i);
     }
 
-    // Animation goes in a circle 3 times 1->2->3->4->5->9->8->7->6
+    // Animation goes in a circle 3 times 1->2->3->4->8->7->6->5
     // could loop through an array with the proper mole ids
-    int path[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int path[] = {1, 2, 3, 4, 8, 7, 6, 5};
 
     int start_delay = 0;
 
@@ -438,7 +464,7 @@ void DisplayInterface::lose_game()
     }
 
     // Second and last row, may need to extend start time so itll be a flash and turn black for a few seconds
-    for (int id = 5; id <= total_moles; id++)
+    for (int id = 4; id <= total_moles; id++)
     {
         queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + total_offset, flash_duration, -1, -1, nullptr, Colour::Red);
     }
@@ -446,7 +472,7 @@ void DisplayInterface::lose_game()
     total_offset += flash_duration + gap_duration;
 
     // Last row
-    for (int id = 8; id <= total_moles; id++)
+    for (int id = 6; id <= total_moles; id++)
     {
         queue_animation(LedType::Ring, AnimationCategory::Solid, id, start_time_ms + total_offset, flash_duration, -1, -1, nullptr, Colour::Red);
     }
@@ -467,7 +493,7 @@ void DisplayInterface::idle_state()
 }
 
 // *************************************
-// 7-Seg Helper Functions
+// 7-Seg
 // *************************************
 
 void DisplayInterface::show_score(int current_score)
@@ -523,7 +549,7 @@ void DisplayInterface::game_over(const String &result)
 }
 
 // // *************************************
-// // OLED Helper Functions
+// // OLED
 // // *************************************
 
 void DisplayInterface::update_oled_gameplay(int current_level, int current_round, int score)
@@ -576,24 +602,32 @@ void DisplayInterface::display_final_score(int final_score)
 
 bool DisplayInterface::is_score_in_leaderboard(int score)
 {
-    for (int i = 0; i < MAX_LEADERBOARD_ENTRIES; i++)
+    // Board not full yet — always allow entry
+    if (leaderboardSize < MAX_LEADERBOARD_ENTRIES)
     {
-        if (score == leaderboard[i].score)
+        return true;
+    }
+
+    // Board full — only allow if score beats the lowest entry
+    int lowest_score = leaderboard[0].score;
+    for (int i = 1; i < leaderboardSize; i++)
+    {
+        if (leaderboard[i].score < lowest_score)
         {
-            return true;
+            lowest_score = leaderboard[i].score;
         }
     }
 
-    return false;
+    return score > lowest_score;
 }
 
 void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter,
                                                      int final_score, uint8_t fill_index, bool confirm)
 {
 
-    if (fill_index > 2)
+    if (fill_index > NAME_LENGTH - 1)
     {
-        fill_index = 2; // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
+        fill_index = NAME_LENGTH - 1; // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
     }
 
     if (confirm)
@@ -604,7 +638,10 @@ void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char f
         name += second_letter;
         name += third_letter;
 
-        // add_to_leaderboard(name, final_score); // NEED A FUNCTION FOR THIS
+        if (is_score_in_leaderboard(entry_score))
+        { // guard here
+            add_to_leaderboard(name, entry_score);
+        }
         return;
     }
 
@@ -650,6 +687,231 @@ void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char f
     oled.drawLine(underline_at_letter, underline_y, underline_at_letter + 18, underline_y, SSD1306_WHITE);
 
     oled.display();
+}
+
+// ── Public: call once when transitioning into name-entry mode ───
+void DisplayInterface::begin_leaderboard_entry(int final_score)
+{
+    entry_hovered_index = 0;
+    entry_fill_index = 0;
+    entry_score = final_score;
+    entry_awaiting_confirm = false; // ADD THIS
+    entry_saved_at_ms = 0;          // ADD THIS
+
+    // Pre-fill slots with '_' so the OLED always shows 3 characters.
+    for (int i = 0; i < NAME_LENGTH; i++)
+    {
+        entry_letters[i] = '_';
+    }
+    entry_letters[NAME_LENGTH] = '\0';
+
+    entry_prev_A_state = LOW; // will sync on the first update call
+
+    redraw_entry_oled();
+}
+
+// PUBLIC: Returns true once the 3rd letter is confirmed and saved.
+bool DisplayInterface::update_leaderboard_entry(int encoder_delta, int unused, bool button_pressed)
+{
+
+    // ROTARY ENCODER — ignore rotation while waiting for confirm click
+    if (encoder_delta != 0 && !entry_awaiting_confirm)
+    {
+        if (encoder_delta > 0)
+        {
+            if (entry_hovered_index == 25)
+                entry_hovered_index = 0;
+            else
+                entry_hovered_index++;
+        }
+        else
+        {
+            if (entry_hovered_index == 0)
+                entry_hovered_index = 25;
+            else
+                entry_hovered_index--;
+        }
+        redraw_entry_oled();
+    }
+
+    // BUTTON
+    if (button_pressed)
+    {
+
+        // ── Confirm click after all 3 letters placed ──
+        if (entry_awaiting_confirm)
+        {
+            String name = "";
+            name += String(entry_letters[0]);
+            name += String(entry_letters[1]);
+            name += String(entry_letters[2]);
+
+            if (is_score_in_leaderboard(entry_score))
+            { // guard here
+                add_to_leaderboard(name, entry_score);
+            }
+            entry_awaiting_confirm = false;
+            entry_saved_at_ms = millis();
+
+            // Show saved screen
+            oled.clearDisplay();
+            oled.setTextColor(SSD1306_WHITE);
+
+            oled.setTextSize(2);
+            oled.setCursor(20, 8);
+            oled.print("SAVED!");
+
+            oled.setTextSize(1);
+            oled.setCursor(20, 36);
+            oled.print("Name:  ");
+            oled.write(entry_letters[0]);
+            oled.write(entry_letters[1]);
+            oled.write(entry_letters[2]);
+
+            oled.setCursor(20, 48);
+            oled.print("Score: ");
+            oled.print(entry_score);
+
+            oled.display();
+            return true; // signal to sketch: entry is done
+        }
+
+        // ── Normal letter selection click ──
+        char chosen = (char)('A' + entry_hovered_index);
+        entry_letters[entry_fill_index] = chosen;
+
+        if (entry_fill_index < 2)
+        {
+            entry_fill_index++;
+            redraw_entry_oled();
+        }
+        else
+        {
+            // 3rd letter placed — next click will confirm/save
+            entry_awaiting_confirm = true;
+            redraw_entry_oled(); // show all 3 letters, cursor stays on slot 3
+        }
+    }
+
+    return false;
+}
+
+// PRIVATE: redraws the OLED entry screen
+void DisplayInterface::redraw_entry_oled()
+{
+    char hovered_letter = (char)('A' + entry_hovered_index);
+
+    entering_names_to_leaderboard(
+        hovered_letter,
+        entry_letters[0],
+        entry_letters[1],
+        entry_letters[2],
+        entry_score,
+        entry_fill_index,
+        false);
+}
+
+// PRIVATE: insertion-sort add into leaderboard array, just add to the leaderboard, doesn't display anything
+void DisplayInterface::add_to_leaderboard(const String &name, int score)
+{
+
+    LeaderboardEntry new_entry;
+    strncpy(new_entry.userame, name.c_str(), USERNAME_MAX_LENGTH - 1);
+    new_entry.userame[USERNAME_MAX_LENGTH - 1] = '\0';
+    new_entry.score = score;
+
+    if (leaderboardSize < MAX_LEADERBOARD_ENTRIES)
+    {
+        leaderboard[leaderboardSize] = new_entry;
+        leaderboardSize++;
+    }
+    else
+    {
+        // Board full — only replace the lowest score if the new one is better.
+        int lowest_idx = 0;
+        for (int i = 1; i < leaderboardSize; i++)
+        {
+            if (leaderboard[i].score < leaderboard[lowest_idx].score)
+            {
+                lowest_idx = i;
+            }
+        }
+        if (score <= leaderboard[lowest_idx].score)
+            return;
+        leaderboard[lowest_idx] = new_entry;
+    }
+
+    // Keep the array sorted descending by score.
+    for (int i = leaderboardSize - 1; i > 0; i--)
+    {
+        if (leaderboard[i].score > leaderboard[i - 1].score)
+        {
+            LeaderboardEntry tmp = leaderboard[i];
+            leaderboard[i] = leaderboard[i - 1];
+            leaderboard[i - 1] = tmp;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+// *************************************
+// QR Code
+// *************************************
+
+void DisplayInterface::show_leaderboard_qr()
+{
+    // Build URL: https://anthonyx4.github.io/qrCodeTesting/?Name1=Score1&Name2=Score2
+    String url = "https://anthonyx4.github.io/qrCodeTesting/?";
+
+    for (int i = 0; i < leaderboardSize; i++)
+    {
+        if (i > 0)
+            url += "&";
+        url += String(leaderboard[i].userame);
+        url += "=";
+        url += String(leaderboard[i].score);
+    }
+
+    // Generate QR code (version 6 supports ~100 chars, ECC Low)
+    QRCode qrcode;
+    uint8_t qrcodeData[qrcode_getBufferSize(6)];
+    qrcode_initText(&qrcode, qrcodeData, 6, ECC_LOW, url.c_str());
+
+    // Calculate scale and offsets to center on 128x64 display
+    // QR version 6 = 41x41 modules
+    uint8_t qr_size = qrcode.size;           // number of modules (e.g. 41)
+    uint8_t scale = SCREEN_HEIGHT / qr_size; // e.g. 64/41 = 1 pixel per module
+    if (scale < 1)
+        scale = 1;
+
+    uint8_t rendered_width = qr_size * scale;
+    uint8_t rendered_height = qr_size * scale;
+    uint8_t x_offset = (SCREEN_WIDTH - rendered_width) / 2;
+    uint8_t y_offset = (SCREEN_HEIGHT - rendered_height) / 2;
+
+    oled.clearDisplay();
+
+    // Render QR modules
+    for (uint8_t y = 0; y < qr_size; y++)
+    {
+        for (uint8_t x = 0; x < qr_size; x++)
+        {
+            if (qrcode_getModule(&qrcode, x, y))
+            {
+                // Fill a scale×scale block for each dark module
+                oled.fillRect(x_offset + x * scale, y_offset + y * scale, scale, scale, SSD1306_WHITE);
+            }
+        }
+    }
+
+    oled.display();
+
+    // Set timer to return to idle after 10 seconds
+    qr_active = true;
+    qr_end_time_ms = millis() + QR_DISPLAY_DURATION_MS;
 }
 
 // *************************************

@@ -10,6 +10,8 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1306.h"
 
+#include "qrcode.h"
+
 // Define constants for OLED
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -18,6 +20,9 @@
 
 // Leaderboard
 #define FINAL_SCORE_DISPLAY_DURATION_MS 10000
+#define NAME_LENGTH 3
+
+#define QR_DISPLAY_DURATION_MS 10000
 
 enum class Colour
 {
@@ -97,12 +102,13 @@ public:
 
     // ring timer + mole hp bar helper functions
     void start_mole(int mole_id, int max_hp, unsigned long duration_ms, const Colour mole_type);
-    void change_mole_hp(int mole_id, int new_hp, int max_hp);
+    void decrease_mole_hp(int mole_id, int new_hp, int max_hp);
+    void increase_mole_hp(int mole_id, int new_hp, int max_hp);
     void end_mole(int mole_id, bool is_timeout, bool is_hp_zero);
 
     // round transition helper functions
     void win_round();
-    void lose_round();
+    // void lose_round();
     void changeDuration(unsigned long newDuration_ms);
     void changeDuration(int moleID, unsigned long newDuration_ms);
 
@@ -120,6 +126,12 @@ public:
     void display_final_score(int final_score);                  // shows final score
     bool is_score_in_leaderboard(int score);
 
+    void begin_leaderboard_entry(int final_score);
+    bool update_leaderboard_entry(int encoder_delta, int unused, bool button_pressed);
+
+    // QR Code
+    void show_leaderboard_qr();
+
 private:
     AnimationList animation_list; // Linked List
     unsigned short leds_per_ring;
@@ -129,7 +141,7 @@ private:
     unsigned short number_of_leds;
     unsigned short rings_data_pin;
     unsigned short hearts_data_pin;
-    unsigned short total_moles = 9;
+    unsigned short total_moles = 8;
     unsigned short total_lives = 3;
     CRGB *leds;
 
@@ -143,13 +155,15 @@ private:
     bool oledReady = false;
 
     // Leaderboard/ OLED
-    static const int MAX_LEADERBOARD_ENTRIES = 10;
-    static const int USERNAME_MAX_LENGTH = 16;
+    static const int MAX_LEADERBOARD_ENTRIES = 2;
+    static const int USERNAME_MAX_LENGTH = 4;
+
     struct LeaderboardEntry
     {
         char userame[USERNAME_MAX_LENGTH]; // 3 letters + null terminator
         int score;
     };
+
     LeaderboardEntry leaderboard[MAX_LEADERBOARD_ENTRIES];
     int leaderboardSize = 0;
 
@@ -157,6 +171,21 @@ private:
     bool final_score_drawn = false;
     int final_score_value = 0;
     unsigned long final_score_end_time_ms = 0;
+
+    int entry_hovered_index = 0;         // 0–25 → 'A'–'Z'
+    uint8_t entry_fill_index = 0;        // 0, 1, or 2
+    char entry_letters[NAME_LENGTH + 1]; // committed chars + '\0'
+    int entry_score = 0;
+    int entry_prev_A_state = LOW;
+    bool entry_awaiting_confirm = false; // true after 3rd letter placed, waiting for confirm click
+    unsigned long entry_saved_at_ms = 0; // timestamp when saved, for 10s display
+
+    void redraw_entry_oled();                               // thin wrapper around entering_names_to_leaderboard
+    void add_to_leaderboard(const String &name, int score); // was called in entering_names_to_leaderboard but never defined
+
+    // QR Code
+    bool qr_active = false;
+    unsigned long qr_end_time_ms = 0;
 
     // internal helper functions
     AnimationObject *queue_animation(
