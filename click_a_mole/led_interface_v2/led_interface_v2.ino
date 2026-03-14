@@ -3,83 +3,91 @@
 #define output_A 2
 #define output_B 3
 
-DisplayInterface display(9, 5, 1, 1, 16, 7, 1);
+DisplayInterface display(9, 5, 1, 1, 16, 4, 1);
 
-/*possible issues*/
-/*
-  1. fill_index doesn't reset; need a function to reset everything
-  2. button might be LOW as pressed
-
-*/
-
-/*BUTTON VARIABLES*/
-const int button_pin = 4; // this button is on the rotary encoder
-int last_button_reading = LOW;
-int prev_button_state = LOW;
+const int button_pin = 5;
+int last_button_reading  = HIGH;
+int prev_button_state    = HIGH;
 unsigned long last_debounce_ms = 0;
 const unsigned long DEBOUNCE_MS = 40;
-/*END BUTTON VARIABLES*/
 
-/*FINAL SCORE??*/
+int accumulated_delta = 0;
 int final_score = 0;
 
-/*HELPER FUNCTIONS*/
+bool button_pressed() {
+  int current_reading = digitalRead(button_pin);
 
-bool button_pressed(){
-  int current_button_reading = digitalRead(button_pin);
-
-  if (current_button_reading != last_button_reading){ // if button was pressed or released
-    last_debounce_ms = millis();
-    last_button_reading = current_button_reading;
-
+  if (current_reading != last_button_reading) {
+    last_debounce_ms    = millis();
+    last_button_reading = current_reading;
   }
 
-  if ((millis() - last_debounce_ms) > DEBOUNCE_MS){ // only use signal if its be stable for debounce_ms 
-  
-    // pressed down (low -> high)
-    if (prev_button_state == LOW && current_button_reading == HIGH){
-      prev_button_state = current_button_reading;
-      return true; // button has been pressed
+  if ((millis() - last_debounce_ms) > DEBOUNCE_MS) {
+    if (prev_button_state == HIGH && current_reading == LOW) {
+      prev_button_state = current_reading;
+      Serial.println("Button Pressed");
+      return true;
     }
+    prev_button_state = current_reading;
+  }
+  return false;
+}
 
-    prev_button_state = current_button_reading;
+int read_encoder_delta() {
+  static int last_encoded = 0b11;
 
+  int A = digitalRead(output_A);
+  int B = digitalRead(output_B);
+  int encoded = (A << 1) | B;
+
+  int delta = 0;
+  int transition = (last_encoded << 2) | encoded;
+
+  switch (transition) {
+    case 0b1110: case 0b1000: case 0b0001: case 0b0111:
+      delta = 1;
+      break;
+    case 0b1101: case 0b0100: case 0b0010: case 0b1011:
+      delta = -1;
+      break;
   }
 
-  return false;
-
-} 
+  last_encoded = encoded;
+  return delta;
+}
 
 void setup() {
-  pinMode(output_A, INPUT);
-  pinMode(output_B, INPUT);
-  pinMode(button_pin, INPUT);
-  
-  display.begin();        // <-- DO THIS FIRST
+  pinMode(output_A,   INPUT_PULLUP);
+  pinMode(output_B,   INPUT_PULLUP);
+  pinMode(button_pin, INPUT_PULLUP);
 
+  display.begin();
   Serial.begin(9600);
-  Serial.println("start");
 
-  last_button_reading = digitalRead(button_pin);
-  prev_button_state = last_button_reading; // HIGH OR LOW, high is pressed down
-  Serial.println("bye");
-
-  display.show_idle_oled_animation();
-
-  Serial.println("hi");
-  // Call when transitioning into name-entry mode (e.g. after game ends)
-  display.begin_leaderboard_entry(final_score);
+  //display.show_idle_oled_animation();
+  display.show_leaderboard_qr();
+  //display.begin_leaderboard_entry(final_score);
 }
 
 void loop() {
-  bool entry_done = display.update_leaderboard_entry(
-    digitalRead(output_A),
-    digitalRead(output_B),
-    button_pressed()
-  );
+  display.process_timed_animations(millis());
+  accumulated_delta += read_encoder_delta();
 
-  if (entry_done){
-    // Entry saved — transition to next game state here
-    display.show_idle_oled_animation(); // placeholder for whatever's next
+  int delta_to_send = 0;
+  if (accumulated_delta >= 4) {
+    delta_to_send = 1;
+    accumulated_delta -= 4;
+  } else if (accumulated_delta <= -4) {
+    delta_to_send = -1;
+    accumulated_delta += 4;
+  }
+
+  bool btn = button_pressed();
+
+  if (delta_to_send != 0 || btn) {
+    bool entry_done = display.update_leaderboard_entry(delta_to_send, 0, btn);
+    if (entry_done) {
+      Serial.println("done");
+    }
   }
 }
