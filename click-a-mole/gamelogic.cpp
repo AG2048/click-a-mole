@@ -479,7 +479,7 @@ void GameLogic::fsm()
         // Serial.print("\n\n"
 
         // delay to simulate display time
-        nextGameState = S_IDLE;
+        nextGameState = S_LEADERBOARD;
     }
     else if (currentGameState == S_LEADERBOARD)
     {
@@ -494,12 +494,20 @@ void GameLogic::fsm()
 
         // // display line on the leaderboard
         // // Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
-        p_di->begin_leaderboard_entry();             // display leaderboard entry animation
-        p_di->update_leaderboard_entry(0, 0, false); // placeholder for updating leaderboard entry with encoder input
-        p_di->show_leaderboard();                    // display leaderboard
-        p_di->prompt_leaderboard_name_entry();       // prompt player to enter name for leaderboard
-        p_di->display_final_score(score);            // display final score on OLED
-        p_di->is_score_in_leaderboard(score);        // check if score is in leaderboard and display accordingly
+
+        p_di->display_final_score(score); // display final score on OLED
+
+        // only ask for name if score is in the leaderboard
+        if (p_di->is_score_in_leaderboard(score))
+        {
+            p_di->begin_leaderboard_entry(); // display leaderboard entry animation
+
+            // wait for player to enter name
+            while (!p_di->update_leaderboard_entry(0, 0, false))
+                ;
+        }
+        p_di->show_leaderboard();    // display leaderboard
+        p_di->show_leaderboard_qr(); // display QR code for leaderboard
 
         nextGameState = S_IDLE;
     }
