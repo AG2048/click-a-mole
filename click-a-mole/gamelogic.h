@@ -20,7 +20,7 @@ class GameLogic
 private:
     Mole **moleArr = nullptr;    // array of mole pointers. NOTE: nullptr is used to ensure that we aren't removing
                                  // memory that hasn't been allocated yet
-    int *buttonStates[8];        // array of button states from mole modules]
+    int buttonStates[8];        // array of button states from mole modules]
     int score;                   // player's score
     int lives;                   // player's lives
     unsigned long roundDuration; // duration for each round
@@ -36,7 +36,7 @@ private:
     GameState currentGameState;
     GameState nextGameState;
     DisplayInterface *p_di;
-    MoleController *p_mi;
+    MoleController *p_mi; 
 
 public:
     void handleInput(char c);                                // process user input character

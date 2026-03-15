@@ -26,25 +26,16 @@ void MoleModule::update(TCA9548A& mux) {
     // Get current button state
     int currentButtonState = digitalRead(buttonPin);
     
-    // Check for state change
-    if (currentButtonState != lastButtonState)
-    {
-        lastDebounceTime = millis();
+    // detect release (pressed -> not pressed)
+    if (lastButtonState == HIGH && currentButtonState == LOW) {
+        // button released
+        buttonPressed = 1;
+        Serial.println("Button 1 released");
     }
 
-    if ((millis() - lastDebounceTime) > debounceDelay) {
-        if (currentButtonState != stableButtonState) {
-            stableButtonState = currentButtonState;
-            
-            if (stableButtonState == HIGH) {
-                buttonPressed = 1;
-            }
-        }
-    }
-
+    // store state for next update
     lastButtonState = currentButtonState;
 
-    
     // Get encoder angle value I2C  
     // Serial.println("ID " + String(sensorID));
     // Wire.beginTransmission(0x70);
@@ -57,10 +48,10 @@ void MoleModule::update(TCA9548A& mux) {
     currAngle = sensor.readAngle();
     mux.closeChannel(sensorID);
 
-    Serial.print("Angle ");
-    Serial.print(sensorID);
-    Serial.print(": ");
-    Serial.println(currAngle);
+    // Serial.print("Angle ");
+    // Serial.print(sensorID);
+    // Serial.print(": ");
+    // Serial.println(currAngle);
 
 
     // Compute motor dir and motor steps from curr and target angle

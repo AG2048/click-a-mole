@@ -85,7 +85,7 @@ void MoleController::updateAll() {
     }
 }
 
-void MoleController::readButtons(int* arr[]) {
+void MoleController::readButtons(int (&arr)[8]) {
     for (int i = 0; i < moleCount; i++) {
         arr[i] = moles[i]->readButton();
     }

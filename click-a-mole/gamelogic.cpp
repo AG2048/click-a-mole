@@ -276,6 +276,7 @@ void GameLogic::fsm()
         p_mi->updateAll();
 
         p_mi->readButtons(buttonStates);
+        // Serial.println("Button pressed game logic");
         p_di->show_score(score); // update score display
 
         
@@ -350,7 +351,6 @@ void GameLogic::fsm()
             if (buttonStates[i] == 1)
             {
                 handleInput('1' + i); // map button press to corresponding mole hit
-                buttonStates[i] = 0;
             }
             // Serial.println(moleArr[i]->getHP());
             // Serial.println(moleArr[i]->maxHP); // NOTE: MAXHP default value is really weird
@@ -358,7 +358,13 @@ void GameLogic::fsm()
 
         // Serial.println(moleArr[0]->maxHP); // NOTE: MAXHP default value is really weird
         p_mi->updateAll();
-        p_mi->readButtons(buttonStates); // read button states again after handling input
+        // p_mi->readButtons(buttonStates); // read button states again after handling input
+        // Serial.print("button 0:");
+        // Serial.println(buttonStates[0]);
+        // Serial.print("button 1:");
+        // Serial.println(buttonStates[1]);
+        // Serial.print("button 2:");
+        // Serial.println(buttonStates[2]);
 
         for (int i = 0; i < TOTAL_MOLES; i++)
         {

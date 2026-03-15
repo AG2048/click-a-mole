@@ -30,7 +30,7 @@ public:
     void updateAll();
 
     // Returns array of button states from all MoleModules
-    void readButtons(int *arr[]);
+    void readButtons(int (&arr)[8]);
 
     // Call setHp() on MoleModule at index of moles vector
     void setHp(int index, int currHp, int maxHp);
