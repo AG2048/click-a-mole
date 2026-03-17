@@ -10,7 +10,7 @@
 #include "Adafruit_GFX.h"  
 #include "Adafruit_SSD1306.h"
 
-#include "qrcode.h"
+//#include "qrcode.h"
 
 // Define constants for OLED
 #define SCREEN_WIDTH 128
@@ -22,7 +22,7 @@
 #define FINAL_SCORE_DISPLAY_DURATION_MS 10000
 #define NAME_LENGTH 3
 
-#define QR_DISPLAY_DURATION_MS 10000
+//#define QR_DISPLAY_DURATION_MS 10000
 
 
 enum class Colour {
@@ -128,8 +128,12 @@ class DisplayInterface {
         void begin_leaderboard_entry(int final_score);
         bool update_leaderboard_entry(int encoder_delta, int unused, bool button_pressed);
 
+        
+        // OLED CLEAR DISPLAY
+        void clear_display();
+
         // QR Code
-        void show_leaderboard_qr();
+        //void show_leaderboard_qr();
 
         
     private:
@@ -155,7 +159,7 @@ class DisplayInterface {
         bool oledReady = false;
 
         // Leaderboard/ OLED
-        static const int MAX_LEADERBOARD_ENTRIES = 2;
+        static const int MAX_LEADERBOARD_ENTRIES = 1;
         static const int USERNAME_MAX_LENGTH = 4;
 
         struct LeaderboardEntry {
@@ -182,9 +186,9 @@ class DisplayInterface {
         void redraw_entry_oled();                               // thin wrapper around entering_names_to_leaderboard
         void add_to_leaderboard(const String& name, int score); // was called in entering_names_to_leaderboard but never defined
 
-        // QR Code
-        bool qr_active = false;
-        unsigned long qr_end_time_ms = 0;
+        // // QR Code
+        // bool qr_active = false;
+        // unsigned long qr_end_time_ms = 0;
 
         //internal helper functions
         AnimationObject* queue_animation(

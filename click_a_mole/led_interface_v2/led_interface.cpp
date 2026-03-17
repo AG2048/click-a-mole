@@ -64,12 +64,20 @@ const unsigned char diglett[] PROGMEM = {
 // *************************************
 
 void DisplayInterface::begin() {
-  Wire.begin();  // IMPORTANT
+  Wire.begin();
+  Serial.println("Wire OK");
+  
   sevenSeg.begin(0x75);
+  Serial.println("7seg OK");
+  
   sevenSeg.clear();
   sevenSeg.writeDisplay();
   sevenSegReady = true;
+  Serial.println("7seg ready");
+  
   oledReady = oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_I2C_ADDRESS);
+  Serial.println("OLED done");
+  Serial.println(oledReady);
 }
 
 // Constructor
@@ -366,19 +374,19 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms) {
     }
   }
 
-  if (current_time_ms >= final_score_end_time_ms) {
+
+  // Change the condition to also require final_score_active:
+if (final_score_active && current_time_ms >= final_score_end_time_ms) {
     final_score_active = false;
     final_score_drawn = false;
-
-    // retrn to idle screen or clear
-    show_idle_oled_animation();
-  }
+    if (oledReady) show_idle_oled_animation();
+}
   
-  // QR CODE DISPLAY TIMEOUT
-  if (qr_active && current_time_ms >= qr_end_time_ms) {
-    qr_active = false;
-    show_idle_oled_animation();
-  }
+  // // QR CODE DISPLAY TIMEOUT
+  // if (qr_active && current_time_ms >= qr_end_time_ms) {
+  //   qr_active = false;
+  //   if (oledReady) show_idle_oled_animation();
+  // }
 }
 
 void DisplayInterface::win_game() {
@@ -496,6 +504,11 @@ void DisplayInterface::game_over(const String& result) {
 // // *************************************
 // // OLED
 // // *************************************
+
+void DisplayInterface::clear_display(){
+  oled.clearDisplay();
+}
+
 
 void DisplayInterface::update_oled_gameplay(int current_level, int current_round, int score) {
   // Implementation for updating OLED display during gameplay
@@ -763,55 +776,55 @@ void DisplayInterface::add_to_leaderboard(const String& name, int score) {
   }
 }
 
-// *************************************
-// QR Code
-// *************************************
+//*************************************
+//QR Code
+//*************************************
 
-void DisplayInterface::show_leaderboard_qr() {
-  // Build URL: https://anthonyx4.github.io/qrCodeTesting/?Name1=Score1&Name2=Score2
-  String url = "https://anthonyx4.github.io/qrCodeTesting/?";
+// void DisplayInterface::show_leaderboard_qr() {
+//   // Build URL: https://anthonyx4.github.io/qrCodeTesting/?Name1=Score1&Name2=Score2
+//   String url = "https://anthonyx4.github.io/qrCodeTesting/?";
 
-  for (int i = 0; i < leaderboardSize; i++) {
-    if (i > 0) url += "&";
-    url += String(leaderboard[i].userame);
-    url += "=";
-    url += String(leaderboard[i].score);
-  }
+//   for (int i = 0; i < leaderboardSize; i++) {
+//     if (i > 0) url += "&";
+//     url += String(leaderboard[i].userame);
+//     url += "=";
+//     url += String(leaderboard[i].score);
+//   }
 
-  // Generate QR code (version 6 supports ~100 chars, ECC Low)
-  QRCode qrcode;
-  uint8_t qrcodeData[qrcode_getBufferSize(6)];
-  qrcode_initText(&qrcode, qrcodeData, 6, ECC_LOW, url.c_str());
+//   // Generate QR code (version 6 supports ~100 chars, ECC Low)
+//   QRCode qrcode;
+//   uint8_t qrcodeData[qrcode_getBufferSize(6)];
+//   qrcode_initText(&qrcode, qrcodeData, 6, ECC_LOW, url.c_str());
 
-  // Calculate scale and offsets to center on 128x64 display
-  // QR version 6 = 41x41 modules
-  uint8_t qr_size = qrcode.size;         // number of modules (e.g. 41)
-  uint8_t scale = SCREEN_HEIGHT / qr_size; // e.g. 64/41 = 1 pixel per module
-  if (scale < 1) scale = 1;
+//   // Calculate scale and offsets to center on 128x64 display
+//   // QR version 6 = 41x41 modules
+//   uint8_t qr_size = qrcode.size;         // number of modules (e.g. 41)
+//   uint8_t scale = SCREEN_HEIGHT / qr_size; // e.g. 64/41 = 1 pixel per module
+//   if (scale < 1) scale = 1;
 
-  uint8_t rendered_width  = qr_size * scale;
-  uint8_t rendered_height = qr_size * scale;
-  uint8_t x_offset = (SCREEN_WIDTH  - rendered_width)  / 2;
-  uint8_t y_offset = (SCREEN_HEIGHT - rendered_height) / 2;
+//   uint8_t rendered_width  = qr_size * scale;
+//   uint8_t rendered_height = qr_size * scale;
+//   uint8_t x_offset = (SCREEN_WIDTH  - rendered_width)  / 2;
+//   uint8_t y_offset = (SCREEN_HEIGHT - rendered_height) / 2;
 
-  oled.clearDisplay();
+//   oled.clearDisplay();
 
-  // Render QR modules
-  for (uint8_t y = 0; y < qr_size; y++) {
-    for (uint8_t x = 0; x < qr_size; x++) {
-      if (qrcode_getModule(&qrcode, x, y)) {
-        // Fill a scale×scale block for each dark module
-        oled.fillRect(x_offset + x * scale, y_offset + y * scale, scale, scale,  SSD1306_WHITE);
-      }
-    }
-  }
+//   // Render QR modules
+//   for (uint8_t y = 0; y < qr_size; y++) {
+//     for (uint8_t x = 0; x < qr_size; x++) {
+//       if (qrcode_getModule(&qrcode, x, y)) {
+//         // Fill a scale×scale block for each dark module
+//         oled.fillRect(x_offset + x * scale, y_offset + y * scale, scale, scale,  SSD1306_WHITE);
+//       }
+//     }
+//   }
 
-  oled.display();
+//   oled.display();
 
-  // Set timer to return to idle after 10 seconds
-  qr_active = true;
-  qr_end_time_ms = millis() + QR_DISPLAY_DURATION_MS;
-}
+//   // Set timer to return to idle after 10 seconds
+//   qr_active = true;
+//   qr_end_time_ms = millis() + QR_DISPLAY_DURATION_MS;
+// }
 
 // *************************************
 // Helper Functions
