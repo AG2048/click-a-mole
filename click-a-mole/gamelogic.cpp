@@ -347,10 +347,22 @@ void GameLogic::fsm()
             m->setDuration(lifetime);
             m->setStartTime(now);
 
-            int hp = randomHpForMole(level, lifetime);
-            m->setMaxHP(hp);
-            m->setHP(hp);
-            p_mi->setHp(0, hp, hp);
+            int hp = 0;
+            if (spawnType == 3) // Gold
+            {
+                lifetime = minDur; // shortest possible lifetime
+                m->setDuration(lifetime);
+                m->setMaxHP(1);
+                m->setHP(1);
+            }
+            else
+            {
+                int hp = randomHpForMole(level, lifetime);
+                m->setMaxHP(hp);
+                m->setHP(hp);
+            }
+
+            p_mi->setHp(idx, hp, hp);
             m->setPosition(true, p_di); // set mole to up position
 
             p_di->start_mole(idx, hp, lifetime, m->getColour());
@@ -379,7 +391,7 @@ void GameLogic::fsm()
             Serial.println(moleArr[i]->maxHP);
         }
 
-        p_mi->updateAll();
+        p_mi->readButtons(buttonStates); // read button states again after handling input to ensure we don't miss any quick presses
 
         for (int i = 0; i < TOTAL_MOLES; i++)
         {
