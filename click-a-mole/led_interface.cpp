@@ -75,9 +75,9 @@ void DisplayInterface::begin() {
   sevenSegReady = true;
   Serial.println("7seg ready");
   
-  oledReady = oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_I2C_ADDRESS);
-  Serial.println("OLED done");
-  Serial.println(oledReady);
+  // oledReady = oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_I2C_ADDRESS);
+  // Serial.println("OLED done");
+  // Serial.println(oledReady);
 }
 
 // Constructor
@@ -357,30 +357,30 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms) {
   FastLED.show();
 
 
-  /* OLED FINAL SCORE */
+  // /* OLED FINAL SCORE */
 
-  if (final_score_active) {
-    if (!final_score_drawn) {
-      oled.clearDisplay();
-      oled.setTextSize(2);
+  // if (final_score_active) {
+  //   if (!final_score_drawn) {
+  //     oled.clearDisplay();
+  //     oled.setTextSize(2);
 
-      oled.setTextColor(WHITE);
-      oled.setCursor(15, 20);
-      oled.print("Score:");
-      oled.setCursor(50, 40);
-      oled.print(final_score_value);
-      oled.display();
-      final_score_drawn = true;
-    }
-  }
+  //     oled.setTextColor(WHITE);
+  //     oled.setCursor(15, 20);
+  //     oled.print("Score:");
+  //     oled.setCursor(50, 40);
+  //     oled.print(final_score_value);
+  //     oled.display();
+  //     final_score_drawn = true;
+  //   }
+  // }
 
 
-  // Change the condition to also require final_score_active:
-if (final_score_active && current_time_ms >= final_score_end_time_ms) {
-    final_score_active = false;
-    final_score_drawn = false;
-    if (oledReady) show_idle_oled_animation();
-}
+//   // Change the condition to also require final_score_active:
+// if (final_score_active && current_time_ms >= final_score_end_time_ms) {
+//     final_score_active = false;
+//     final_score_drawn = false;
+//     if (oledReady) show_idle_oled_animation();
+// }
   
   // // QR CODE DISPLAY TIMEOUT
   // if (qr_active && current_time_ms >= qr_end_time_ms) {
@@ -505,313 +505,313 @@ void DisplayInterface::game_over(const String& result) {
 // // OLED
 // // *************************************
 
-void DisplayInterface::clear_display(){
-  oled.clearDisplay();
-}
+// void DisplayInterface::clear_display(){
+//   oled.clearDisplay();
+// }
 
 
-void DisplayInterface::update_oled_gameplay(int current_level, int current_round, int score) {
-  // Implementation for updating OLED display during gameplay
-  oled.clearDisplay();
-  oled.setTextSize(1);
-  oled.setTextColor(WHITE);
-  oled.setCursor(0, 0);
-  oled.print("Level: ");
-  oled.println(current_level);
+// void DisplayInterface::update_oled_gameplay(int current_level, int current_round, int score) {
+//   // Implementation for updating OLED display during gameplay
+//   oled.clearDisplay();
+//   oled.setTextSize(1);
+//   oled.setTextColor(WHITE);
+//   oled.setCursor(0, 0);
+//   oled.print("Level: ");
+//   oled.println(current_level);
 
-  oled.setCursor(0, 10);
-  oled.print("Round: ");
-  oled.println(current_round);
+//   oled.setCursor(0, 10);
+//   oled.print("Round: ");
+//   oled.println(current_round);
 
-  oled.setCursor(0, 20);
-  oled.print("Score: ");
-  oled.println(score);
-  oled.display();
+//   oled.setCursor(0, 20);
+//   oled.print("Score: ");
+//   oled.println(score);
+//   oled.display();
 
-  //maybe animate a mole during gameplay on the side
-}
+//   //maybe animate a mole during gameplay on the side
+// }
 
-void DisplayInterface::show_idle_oled_animation() {
-  // Implementation for idle animation on OLED display
-  oled.clearDisplay();
-  oled.setTextSize(1);
+// void DisplayInterface::show_idle_oled_animation() {
+//   // Implementation for idle animation on OLED display
+//   oled.clearDisplay();
+//   oled.setTextSize(1);
 
-  oled.setTextColor(WHITE);
-  oled.setCursor(20, 0);
-  oled.println("Click-A-Mole!");
+//   oled.setTextColor(WHITE);
+//   oled.setCursor(20, 0);
+//   oled.println("Click-A-Mole!");
 
-  // Draw Diglett bitmap at center
-  int x = (SCREEN_WIDTH - 64) / 2;
-  int y = (SCREEN_HEIGHT - 64) / 2 + 10;
-  oled.drawBitmap(x, y, diglett, 64, 64, SSD1306_WHITE);
-  oled.display();
-}
+//   // Draw Diglett bitmap at center
+//   int x = (SCREEN_WIDTH - 64) / 2;
+//   int y = (SCREEN_HEIGHT - 64) / 2 + 10;
+//   oled.drawBitmap(x, y, diglett, 64, 64, SSD1306_WHITE);
+//   oled.display();
+// }
 
-void DisplayInterface::display_final_score(int final_score) {
-  final_score_active = true;
-  final_score_drawn = false;
-  final_score_value = final_score;
+// void DisplayInterface::display_final_score(int final_score) {
+//   final_score_active = true;
+//   final_score_drawn = false;
+//   final_score_value = final_score;
 
-  final_score_end_time_ms = millis() + FINAL_SCORE_DISPLAY_DURATION_MS;
-}
+//   final_score_end_time_ms = millis() + FINAL_SCORE_DISPLAY_DURATION_MS;
+// }
 
-bool DisplayInterface::is_score_in_leaderboard(int score) {
-  // Board not full yet — always allow entry
-  if (leaderboardSize < MAX_LEADERBOARD_ENTRIES) {
-    return true;
-  }
+// bool DisplayInterface::is_score_in_leaderboard(int score) {
+//   // Board not full yet — always allow entry
+//   if (leaderboardSize < MAX_LEADERBOARD_ENTRIES) {
+//     return true;
+//   }
 
-  // Board full — only allow if score beats the lowest entry
-  int lowest_score = leaderboard[0].score;
-  for (int i = 1; i < leaderboardSize; i++) {
-    if (leaderboard[i].score < lowest_score) {
-      lowest_score = leaderboard[i].score;
-    }
-  }
+//   // Board full — only allow if score beats the lowest entry
+//   int lowest_score = leaderboard[0].score;
+//   for (int i = 1; i < leaderboardSize; i++) {
+//     if (leaderboard[i].score < lowest_score) {
+//       lowest_score = leaderboard[i].score;
+//     }
+//   }
 
-  return score > lowest_score;
-}
+//   return score > lowest_score;
+// }
 
-void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter,
-                                                     int final_score, uint8_t fill_index, bool confirm) {
+// void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter,
+//                                                      int final_score, uint8_t fill_index, bool confirm) {
 
-  if (fill_index > NAME_LENGTH - 1) {
-    fill_index = NAME_LENGTH - 1;  // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
-  }
+//   if (fill_index > NAME_LENGTH - 1) {
+//     fill_index = NAME_LENGTH - 1;  // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
+//   }
 
-  if (confirm) {
-    // add name and score to leaderboard
-    String name = "";
-    name += first_letter;
-    name += second_letter;
-    name += third_letter;
+//   if (confirm) {
+//     // add name and score to leaderboard
+//     String name = "";
+//     name += first_letter;
+//     name += second_letter;
+//     name += third_letter;
 
-  if (is_score_in_leaderboard(entry_score)) {  // guard here
-    add_to_leaderboard(name, entry_score);
-  }
-    return;
-  }
+//   if (is_score_in_leaderboard(entry_score)) {  // guard here
+//     add_to_leaderboard(name, entry_score);
+//   }
+//     return;
+//   }
 
-  /*DRAW ENTRY SCREEN*/
+//   /*DRAW ENTRY SCREEN*/
 
-  oled.clearDisplay();
-  oled.setTextColor(SSD1306_WHITE);
-  oled.setTextSize(1);
+//   oled.clearDisplay();
+//   oled.setTextColor(SSD1306_WHITE);
+//   oled.setTextSize(1);
 
-  // Top: hovered letter
-  oled.setCursor(0, 0);
-  oled.print("Select: ");
-  oled.print(hovered_letter);
+//   // Top: hovered letter
+//   oled.setCursor(0, 0);
+//   oled.print("Select: ");
+//   oled.print(hovered_letter);
 
-  // Score line
-  oled.setCursor(0, 10);
-  oled.print("Score: ");
-  oled.print(final_score);
+//   // Score line
+//   oled.setCursor(0, 10);
+//   oled.print("Score: ");
+//   oled.print(final_score);
 
-  // Instruction
-  oled.setCursor(0, 20);
-  oled.print("Press to confirm");
+//   // Instruction
+//   oled.setCursor(0, 20);
+//   oled.print("Press to confirm");
 
-  // Big letters (committed)
-  oled.setTextSize(3);
+//   // Big letters (committed)
+//   oled.setTextSize(3);
 
-  const int letters_y = 34;
-  const int letters_x_start = 18;
-  const int letters_spacing = 30;
+//   const int letters_y = 34;
+//   const int letters_x_start = 18;
+//   const int letters_spacing = 30;
 
-  oled.setCursor(letters_x_start, letters_y);
-  oled.write(first_letter);
+//   oled.setCursor(letters_x_start, letters_y);
+//   oled.write(first_letter);
 
-  oled.setCursor(letters_x_start + letters_spacing, letters_y);
-  oled.write(second_letter);
+//   oled.setCursor(letters_x_start + letters_spacing, letters_y);
+//   oled.write(second_letter);
 
-  oled.setCursor(letters_x_start + 2 * letters_spacing, letters_y);
-  oled.write(third_letter);
+//   oled.setCursor(letters_x_start + 2 * letters_spacing, letters_y);
+//   oled.write(third_letter);
 
-  // Underline cursor at current fill_index
-  const int underline_y = letters_y + 28;
-  int underline_at_letter = letters_x_start + (int)fill_index * letters_spacing;
-  oled.drawLine(underline_at_letter, underline_y, underline_at_letter + 18, underline_y, SSD1306_WHITE);
+//   // Underline cursor at current fill_index
+//   const int underline_y = letters_y + 28;
+//   int underline_at_letter = letters_x_start + (int)fill_index * letters_spacing;
+//   oled.drawLine(underline_at_letter, underline_y, underline_at_letter + 18, underline_y, SSD1306_WHITE);
 
-  oled.display();
-}
+//   oled.display();
+// }
 
-// ── Public: call once when transitioning into name-entry mode ───
-void DisplayInterface::begin_leaderboard_entry(int final_score) {
-  entry_hovered_index = 0;
-  entry_fill_index = 0;
-  entry_score = final_score;
-  entry_awaiting_confirm = false;  // ADD THIS
-  entry_saved_at_ms = 0;           // ADD THIS
+// // ── Public: call once when transitioning into name-entry mode ───
+// void DisplayInterface::begin_leaderboard_entry(int final_score) {
+//   entry_hovered_index = 0;
+//   entry_fill_index = 0;
+//   entry_score = final_score;
+//   entry_awaiting_confirm = false;  // ADD THIS
+//   entry_saved_at_ms = 0;           // ADD THIS
 
-  // Pre-fill slots with '_' so the OLED always shows 3 characters.
-  for (int i = 0; i < NAME_LENGTH; i++) {
-    entry_letters[i] = '_';
-  }
-  entry_letters[NAME_LENGTH] = '\0';
+//   // Pre-fill slots with '_' so the OLED always shows 3 characters.
+//   for (int i = 0; i < NAME_LENGTH; i++) {
+//     entry_letters[i] = '_';
+//   }
+//   entry_letters[NAME_LENGTH] = '\0';
 
-  entry_prev_A_state = LOW;  // will sync on the first update call
+//   entry_prev_A_state = LOW;  // will sync on the first update call
 
-  redraw_entry_oled();
-}
+//   redraw_entry_oled();
+// }
 
 
-// PUBLIC: Returns true once the 3rd letter is confirmed and saved.
-bool DisplayInterface::update_leaderboard_entry(int encoder_delta, int unused, bool button_pressed) {
+// // PUBLIC: Returns true once the 3rd letter is confirmed and saved.
+// bool DisplayInterface::update_leaderboard_entry(int encoder_delta, int unused, bool button_pressed) {
 
-  // ROTARY ENCODER — ignore rotation while waiting for confirm click
-  if (encoder_delta != 0 && !entry_awaiting_confirm) {
-    if (encoder_delta > 0) {
-      if (entry_hovered_index == 25) entry_hovered_index = 0;
-      else entry_hovered_index++;
-    } else {
-      if (entry_hovered_index == 0) entry_hovered_index = 25;
-      else entry_hovered_index--;
-    }
-    redraw_entry_oled();
-  }
+//   // ROTARY ENCODER — ignore rotation while waiting for confirm click
+//   if (encoder_delta != 0 && !entry_awaiting_confirm) {
+//     if (encoder_delta > 0) {
+//       if (entry_hovered_index == 25) entry_hovered_index = 0;
+//       else entry_hovered_index++;
+//     } else {
+//       if (entry_hovered_index == 0) entry_hovered_index = 25;
+//       else entry_hovered_index--;
+//     }
+//     redraw_entry_oled();
+//   }
 
-  // BUTTON
-  if (button_pressed) {
+//   // BUTTON
+//   if (button_pressed) {
 
-    // ── Confirm click after all 3 letters placed ──
-    if (entry_awaiting_confirm) {
-      String name = "";
-      name += String(entry_letters[0]);
-      name += String(entry_letters[1]);
-      name += String(entry_letters[2]);
+//     // ── Confirm click after all 3 letters placed ──
+//     if (entry_awaiting_confirm) {
+//       String name = "";
+//       name += String(entry_letters[0]);
+//       name += String(entry_letters[1]);
+//       name += String(entry_letters[2]);
 
-      if (is_score_in_leaderboard(entry_score)) {  // guard here
-        add_to_leaderboard(name, entry_score);
-      }
-      entry_awaiting_confirm = false;
-      entry_saved_at_ms = millis();
+//       if (is_score_in_leaderboard(entry_score)) {  // guard here
+//         add_to_leaderboard(name, entry_score);
+//       }
+//       entry_awaiting_confirm = false;
+//       entry_saved_at_ms = millis();
 
-      // Show saved screen
-      oled.clearDisplay();
-      oled.setTextColor(SSD1306_WHITE);
+//       // Show saved screen
+//       oled.clearDisplay();
+//       oled.setTextColor(SSD1306_WHITE);
 
-      oled.setTextSize(2);
-      oled.setCursor(20, 8);
-      oled.print("SAVED!");
+//       oled.setTextSize(2);
+//       oled.setCursor(20, 8);
+//       oled.print("SAVED!");
 
-      oled.setTextSize(1);
-      oled.setCursor(20, 36);
-      oled.print("Name:  ");
-      oled.write(entry_letters[0]);
-      oled.write(entry_letters[1]);
-      oled.write(entry_letters[2]);
+//       oled.setTextSize(1);
+//       oled.setCursor(20, 36);
+//       oled.print("Name:  ");
+//       oled.write(entry_letters[0]);
+//       oled.write(entry_letters[1]);
+//       oled.write(entry_letters[2]);
 
-      oled.setCursor(20, 48);
-      oled.print("Score: ");
-      oled.print(entry_score);
+//       oled.setCursor(20, 48);
+//       oled.print("Score: ");
+//       oled.print(entry_score);
 
-      oled.display();
-      return true;  // signal to sketch: entry is done
-    }
+//       oled.display();
+//       return true;  // signal to sketch: entry is done
+//     }
 
-    // ── Normal letter selection click ──
-    char chosen = (char)('A' + entry_hovered_index);
-    entry_letters[entry_fill_index] = chosen;
+//     // ── Normal letter selection click ──
+//     char chosen = (char)('A' + entry_hovered_index);
+//     entry_letters[entry_fill_index] = chosen;
 
-    if (entry_fill_index < 2) {
-      entry_fill_index++;
-      redraw_entry_oled();
-    } else {
-      // 3rd letter placed — next click will confirm/save
-      entry_awaiting_confirm = true;
-      redraw_entry_oled();  // show all 3 letters, cursor stays on slot 3
-    }
-  }
+//     if (entry_fill_index < 2) {
+//       entry_fill_index++;
+//       redraw_entry_oled();
+//     } else {
+//       // 3rd letter placed — next click will confirm/save
+//       entry_awaiting_confirm = true;
+//       redraw_entry_oled();  // show all 3 letters, cursor stays on slot 3
+//     }
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
-// PRIVATE: redraws the OLED entry screen
-void DisplayInterface::redraw_entry_oled() {
-  char hovered_letter = (char)('A' + entry_hovered_index);
+// // PRIVATE: redraws the OLED entry screen
+// void DisplayInterface::redraw_entry_oled() {
+//   char hovered_letter = (char)('A' + entry_hovered_index);
 
-  entering_names_to_leaderboard(
-    hovered_letter,
-    entry_letters[0],
-    entry_letters[1],
-    entry_letters[2],
-    entry_score,
-    entry_fill_index,
-    false);
-}
+//   entering_names_to_leaderboard(
+//     hovered_letter,
+//     entry_letters[0],
+//     entry_letters[1],
+//     entry_letters[2],
+//     entry_score,
+//     entry_fill_index,
+//     false);
+// }
 
-// PRIVATE: insertion-sort add into leaderboard array, just add to the leaderboard, doesn't display anything
-void DisplayInterface::add_to_leaderboard(const String& name, int score) {
+// // PRIVATE: insertion-sort add into leaderboard array, just add to the leaderboard, doesn't display anything
+// void DisplayInterface::add_to_leaderboard(const String& name, int score) {
 
-  LeaderboardEntry new_entry;
-  strncpy(new_entry.userame, name.c_str(), USERNAME_MAX_LENGTH - 1);
-  new_entry.userame[USERNAME_MAX_LENGTH - 1] = '\0';
-  new_entry.score = score;
+//   LeaderboardEntry new_entry;
+//   strncpy(new_entry.userame, name.c_str(), USERNAME_MAX_LENGTH - 1);
+//   new_entry.userame[USERNAME_MAX_LENGTH - 1] = '\0';
+//   new_entry.score = score;
 
-  if (leaderboardSize < MAX_LEADERBOARD_ENTRIES) {
-    leaderboard[leaderboardSize] = new_entry;
-    leaderboardSize++;
-  } else {
-    // Board full — only replace the lowest score if the new one is better.
-    int lowest_idx = 0;
-    for (int i = 1; i < leaderboardSize; i++) {
-      if (leaderboard[i].score < leaderboard[lowest_idx].score) {
-        lowest_idx = i;
-      }
-    }
-    if (score <= leaderboard[lowest_idx].score) return;
-    leaderboard[lowest_idx] = new_entry;
-  }
+//   if (leaderboardSize < MAX_LEADERBOARD_ENTRIES) {
+//     leaderboard[leaderboardSize] = new_entry;
+//     leaderboardSize++;
+//   } else {
+//     // Board full — only replace the lowest score if the new one is better.
+//     int lowest_idx = 0;
+//     for (int i = 1; i < leaderboardSize; i++) {
+//       if (leaderboard[i].score < leaderboard[lowest_idx].score) {
+//         lowest_idx = i;
+//       }
+//     }
+//     if (score <= leaderboard[lowest_idx].score) return;
+//     leaderboard[lowest_idx] = new_entry;
+//   }
 
-  // Keep the array sorted descending by score.
-  for (int i = leaderboardSize - 1; i > 0; i--) {
-    if (leaderboard[i].score > leaderboard[i - 1].score) {
-      LeaderboardEntry tmp = leaderboard[i];
-      leaderboard[i] = leaderboard[i - 1];
-      leaderboard[i - 1] = tmp;
-    } else {
-      break;
-    }
-  }
-}
+//   // Keep the array sorted descending by score.
+//   for (int i = leaderboardSize - 1; i > 0; i--) {
+//     if (leaderboard[i].score > leaderboard[i - 1].score) {
+//       LeaderboardEntry tmp = leaderboard[i];
+//       leaderboard[i] = leaderboard[i - 1];
+//       leaderboard[i - 1] = tmp;
+//     } else {
+//       break;
+//     }
+//   }
+// }
 
-void DisplayInterface::show_leaderboard() {
-    oled.clearDisplay();
-    oled.setTextColor(SSD1306_WHITE);
+// void DisplayInterface::show_leaderboard() {
+//     oled.clearDisplay();
+//     oled.setTextColor(SSD1306_WHITE);
 
-    // Title
-    oled.setTextSize(1);
-    oled.setCursor(25, 0);
-    oled.print("LEADERBOARD");
+//     // Title
+//     oled.setTextSize(1);
+//     oled.setCursor(25, 0);
+//     oled.print("LEADERBOARD");
 
-    // Divider line
-    oled.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
+//     // Divider line
+//     oled.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
 
-    if (leaderboardSize == 0) {
-        oled.setCursor(20, 30);
-        oled.print("Empty...");
-        oled.display();
-        return;
-    }
+//     if (leaderboardSize == 0) {
+//         oled.setCursor(20, 30);
+//         oled.print("Empty...");
+//         oled.display();
+//         return;
+//     }
 
-    // Each entry: "1. AAA  1234"
-    for (int i = 0; i < leaderboardSize; i++) {
-        int y = 14 + i * 12;
+//     // Each entry: "1. AAA  1234"
+//     for (int i = 0; i < leaderboardSize; i++) {
+//         int y = 14 + i * 12;
 
-        oled.setCursor(0, y);
-        oled.print(i + 1);
-        oled.print(".");
+//         oled.setCursor(0, y);
+//         oled.print(i + 1);
+//         oled.print(".");
 
-        oled.setCursor(14, y);
-        oled.print(leaderboard[i].userame);
+//         oled.setCursor(14, y);
+//         oled.print(leaderboard[i].userame);
 
-        oled.setCursor(70, y);
-        oled.print(leaderboard[i].score);
-    }
+//         oled.setCursor(70, y);
+//         oled.print(leaderboard[i].score);
+//     }
 
-    oled.display();
-}
+//     oled.display();
+// }
 
 //*************************************
 //QR Code

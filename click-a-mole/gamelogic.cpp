@@ -226,8 +226,8 @@ void GameLogic::fsm()
         // Serial.println("Game is in IDLE state. Waiting to start...");
         // Serial.println("Press 's' to start the game.");
         p_di->turn_off_score(); // turn off score display
-        p_di->idle_state();     // display idle animation on LEDs and OLED
-        p_di->show_idle_oled_animation();
+        p_di->idle_state();     // display idle animation on LEDs
+        //p_di->show_idle_oled_animation(); // display idle animation on OLED
         char c = getInput();
         if (c == 's')
         {
@@ -297,7 +297,7 @@ void GameLogic::fsm()
         // Serial.println("Button pressed game logic");
 
         p_di->show_score(score);                                                               // update score display
-        p_di->update_oled_gameplay(level, (numMolesDownThisRound / roundMaxMoles) + 1, score); // update OLED display with current level, round, and score
+        //p_di->update_oled_gameplay(level, (numMolesDownThisRound / roundMaxMoles) + 1, score); // update OLED display with current level, round, and score
         unsigned long now = millis();
         int idx = rand() % TOTAL_MOLES; // randomly select a hole index to potentially spawn a mole
         Mole *m = moleArr[idx];
@@ -486,7 +486,7 @@ void GameLogic::fsm()
     else if (currentGameState == S_GAMEOVER)
     {
         p_di->lose_game();                // display lose game animation
-        p_di->display_final_score(score); // display final score on OLED
+        //p_di->display_final_score(score); // display final score on OLED
         p_di->game_over("LOSE");          // display game over animation
         p_mi->resetHp();                  // TO DO + loop over moles to reset hp and position
         // Handle game over state
@@ -512,21 +512,21 @@ void GameLogic::fsm()
         // // display line on the leaderboard
         // // Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
 
-        p_di->display_final_score(score); // display final score on OLED
+        // p_di->display_final_score(score); // display final score on OLED
 
-        // only ask for name if score is in the leaderboard
-        if (p_di->is_score_in_leaderboard(score))
-        {
-            p_di->begin_leaderboard_entry(score); // display leaderboard entry animation
+        // // only ask for name if score is in the leaderboard
+        // if (p_di->is_score_in_leaderboard(score))
+        // {
+        //     p_di->begin_leaderboard_entry(score); // display leaderboard entry animation
 
-            // wait for player to enter name
-            while (!p_di->update_leaderboard_entry(0, 0, false))
-                ;
-        }
+        //     // wait for player to enter name
+        //     while (!p_di->update_leaderboard_entry(0, 0, false))
+        //         ;
+        // }
         // p_di->show_leaderboard();    // display leaderboard
         // p_di->show_leaderboard_qr(); // display QR code for leaderboard
 
-        nextGameState = S_IDLE;
+       // nextGameState = S_IDLE;
     }
     else
     {
