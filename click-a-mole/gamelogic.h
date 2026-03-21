@@ -1,7 +1,7 @@
 #include "mole.h"
 #ifndef GAMELOGIC_H
 #define GAMELOGIC_H
-#define TOTAL_MOLES 8 // CHANGE: TOTAL_MOLES 3
+#define TOTAL_MOLES 1 // CHANGE: TOTAL_MOLES 3
 
 enum GameState
 {

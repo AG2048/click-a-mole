@@ -254,6 +254,7 @@ void GameLogic::fsm()
     {
         // // Serial.print("Starting new round.");
         currNumMolesUp = 0;
+        numMolesDownThisRound = 0;
         maxMolesUp = maxMolesUpForLevel(level);
         roundMaxMoles = molesPerLevel(level);
 
@@ -298,7 +299,7 @@ void GameLogic::fsm()
         p_di->show_score(score);                                                               // update score display
         p_di->update_oled_gameplay(level, (numMolesDownThisRound / roundMaxMoles) + 1, score); // update OLED display with current level, round, and score
         unsigned long now = millis();
-        int idx = rand() % 8;
+        int idx = rand() % TOTAL_MOLES; // randomly select a hole index to potentially spawn a mole
         Mole *m = moleArr[idx];
         // try to spawn a new mole if:
         // 1. enough time passed since last spawn
@@ -372,6 +373,7 @@ void GameLogic::fsm()
             if (buttonStates[i] == 1)
             {
                 handleInput('1' + i); // map button press to corresponding mole hit
+                buttonStates[i] = 0;  // reset button state
             }
             Serial.println(moleArr[i]->getHP());
             Serial.println(moleArr[i]->maxHP);
@@ -480,7 +482,7 @@ void GameLogic::fsm()
         // Serial.print("\n\n"
 
         // delay to simulate display time
-        nextGameState = S_LEADERBOARD;
+        // nextGameState = S_LEADERBOARD;
     }
     else if (currentGameState == S_LEADERBOARD)
     {
