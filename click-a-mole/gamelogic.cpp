@@ -466,6 +466,8 @@ void GameLogic::fsm()
         {
             nextGameState = S_PLAYING;
         }
+
+        p_di->process_timed_animations(millis());
     }
     else if (currentGameState == S_INBETWEENLEVELS)
     {

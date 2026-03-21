@@ -19,7 +19,7 @@ void setup()
         unsigned short rings_data_pin,
         unsigned short hearts_data_pin */
     Serial.begin(9600);
-    p_di = new DisplayInterface( 0, 0, 0, 0, 0, 0, 0); 
+    p_di = new DisplayInterface( 35, 7, 1, 1, 46, 4, -1); 
     p_mi = new MoleController;  
     game = new GameLogic(p_di, p_mi);
     p_mi->init();
