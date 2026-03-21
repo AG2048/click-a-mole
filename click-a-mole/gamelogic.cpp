@@ -501,14 +501,14 @@ void GameLogic::fsm()
         // only ask for name if score is in the leaderboard
         if (p_di->is_score_in_leaderboard(score))
         {
-            p_di->begin_leaderboard_entry(); // display leaderboard entry animation
+            p_di->begin_leaderboard_entry(score); // display leaderboard entry animation
 
             // wait for player to enter name
             while (!p_di->update_leaderboard_entry(0, 0, false))
                 ;
         }
-        p_di->show_leaderboard();    // display leaderboard
-        p_di->show_leaderboard_qr(); // display QR code for leaderboard
+        // p_di->show_leaderboard();    // display leaderboard
+        // p_di->show_leaderboard_qr(); // display QR code for leaderboard
 
         nextGameState = S_IDLE;
     }
