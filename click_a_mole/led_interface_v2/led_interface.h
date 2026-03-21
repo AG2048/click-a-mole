@@ -119,14 +119,13 @@ class DisplayInterface {
         // oled display + leaderboard helper functions
         void show_idle_oled_animation(); // Show OLED idle animation
         void update_oled_gameplay(int current_level, int current_round, int score); // Updates oled during the game play
-        void prompt_leaderboard_name_entry(); 
-        void entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, int final_score, uint8_t fill_index, bool confirm); 
-        void show_leaderboard(const char* leaderboard[], int size); // shows the leaderboard, unrelated to entering names
-        void display_final_score(int final_score); // shows final score
-        bool is_score_in_leaderboard(int score);
 
+        void display_final_score(int final_score); // shows final score
+
+        bool is_score_in_leaderboard(int score);
         void begin_leaderboard_entry(int final_score);
         bool update_leaderboard_entry(int encoder_delta, int unused, bool button_pressed);
+        void show_leaderboard(); // shows the leaderboard, unrelated to entering names
 
         
         // OLED CLEAR DISPLAY
@@ -184,7 +183,9 @@ class DisplayInterface {
         unsigned long entry_saved_at_ms      = 0;      // timestamp when saved, for 10s display
 
         void redraw_entry_oled();                               // thin wrapper around entering_names_to_leaderboard
-        void add_to_leaderboard(const String& name, int score); // was called in entering_names_to_leaderboard but never defined
+        void add_to_leaderboard(const String& name, int score); 
+        // Show the entering leaderboard ui on oled, the undersocres and evertyhing
+        void entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter, int final_score, uint8_t fill_index, bool confirm); // Called by redraw_entry_oled 
 
         // // QR Code
         // bool qr_active = false;

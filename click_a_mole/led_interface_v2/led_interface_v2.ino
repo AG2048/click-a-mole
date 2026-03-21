@@ -51,7 +51,7 @@
 
 #include "led_interface.h"
 
-DisplayInterface display(3, 3, 1, 1, 70, 4, 1);
+DisplayInterface display(1, 1, 1, 1, 300, 4, 1);
 int printed = 0;
 
 void setup() {
@@ -59,41 +59,41 @@ void setup() {
   //display.begin();        // <-- DO THIS FIRST
   Serial.begin(9600);
   //display.update_oled_gameplay(1, 2, 10);
-
-  display.start_mole(1, 3, 8000, Colour::HealerMole);
-  display.start_mole(2, 3, 8000, Colour::HealerMole);
-  display.start_mole(3, 3, 8000, Colour::HealerMole);
-  display.start_mole(4, 3, 8000, Colour::HealerMole);
-  display.start_mole(5, 3, 8000, Colour::HealerMole);
-  display.start_mole(6, 3, 8000, Colour::HealerMole);
-  display.start_mole(7, 3, 8000, Colour::HealerMole);
-  display.start_mole(8, 3, 8000, Colour::HealerMole);
-  display.start_mole(9, 3, 8000, Colour::HealerMole);
-  Serial.println("SETUP TIME: ");
-  Serial.println(millis());
+  display.idle_state();
+  // display.start_mole(1, 3, 8000, Colour::HealerMole);
+  // display.start_mole(2, 3, 8000, Colour::HealerMole);
+  // display.start_mole(3, 3, 8000, Colour::HealerMole);
+  // display.start_mole(4, 3, 8000, Colour::HealerMole);
+  // display.start_mole(5, 3, 8000, Colour::HealerMole);
+  // display.start_mole(6, 3, 8000, Colour::HealerMole);
+  // display.start_mole(7, 3, 8000, Colour::HealerMole);
+  // display.start_mole(8, 3, 8000, Colour::HealerMole);
+  // display.start_mole(9, 3, 8000, Colour::HealerMole);
+  // Serial.println("SETUP TIME: ");
+  // Serial.println(millis());
 }
 
 void loop() {
   display.process_timed_animations(millis());
 
-  if (millis() > 2000 && millis() < 2010){
-    //display.end_mole(1, true, false);
-    display.decrease_mole_hp(2, 2, 3);
-  }
+  // if (millis() > 2000 && millis() < 2010){
+  //   //display.end_mole(1, true, false);
+  //   display.decrease_mole_hp(2, 2, 3);
+  // }
 
-  if (millis() > 5000 && millis() < 5010){
-    display.decrease_mole_hp(2, 1, 3);
-  }
+  // if (millis() > 5000 && millis() < 5010){
+  //   display.decrease_mole_hp(2, 1, 3);
+  // }
 
 
-  if (millis() > 7000 && millis() < 7010){
-    display.end_mole(2, false, true);
-  }
+  // if (millis() > 7000 && millis() < 7010){
+  //   display.end_mole(2, false, true);
+  // }
 
-  if (millis() > 7990 && millis() < 8000){
-    display.lose_game();
+  // if (millis() > 7990 && millis() < 8000){
+  //   display.lose_game();
 
-  }
+  // }
 
 
   // if (display.isMoleAnimationDone(1) && printed == 0){

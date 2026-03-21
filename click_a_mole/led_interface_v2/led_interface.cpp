@@ -776,6 +776,43 @@ void DisplayInterface::add_to_leaderboard(const String& name, int score) {
   }
 }
 
+void DisplayInterface::show_leaderboard() {
+    oled.clearDisplay();
+    oled.setTextColor(SSD1306_WHITE);
+
+    // Title
+    oled.setTextSize(1);
+    oled.setCursor(25, 0);
+    oled.print("LEADERBOARD");
+
+    // Divider line
+    oled.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
+
+    if (leaderboardSize == 0) {
+        oled.setCursor(20, 30);
+        oled.print("Empty...");
+        oled.display();
+        return;
+    }
+
+    // Each entry: "1. AAA  1234"
+    for (int i = 0; i < leaderboardSize; i++) {
+        int y = 14 + i * 12;
+
+        oled.setCursor(0, y);
+        oled.print(i + 1);
+        oled.print(".");
+
+        oled.setCursor(14, y);
+        oled.print(leaderboard[i].userame);
+
+        oled.setCursor(70, y);
+        oled.print(leaderboard[i].score);
+    }
+
+    oled.display();
+}
+
 //*************************************
 //QR Code
 //*************************************
