@@ -957,20 +957,43 @@ CRGB DisplayInterface::convert_to_crgb(Colour colour) {
 
 // Functions returns the starting led index for an led type
 // at a specific mole id
+// int DisplayInterface::convert_led_type_to_led_index(LedType led_type, int mole_id) {
+
+//   // assumes rings, linears, then hearts are wired in series
+//   // eg. ring1, ..., ring9, linear1,..., linear9, heart1, heart2, heart3
+//   // mole ids vary from 1-9
+//   switch (led_type) {
+//     case LedType::Ring:
+//       return (mole_id - 1) * leds_per_ring;
+//     case LedType::Linear:
+//       return (total_moles * leds_per_ring) + (mole_id - 1) * leds_per_linear;
+//     case LedType::Indicator:
+//       return (total_moles * leds_per_ring) + (total_moles * leds_per_linear) + (mole_id - 1) * leds_per_mole_indicator;
+//     case LedType::Heart:
+//       return (total_moles * leds_per_ring) + (total_moles * leds_per_linear) + (total_moles * leds_per_mole_indicator);
+//     default:
+//       return -1;
+//   }
+// }
+
 int DisplayInterface::convert_led_type_to_led_index(LedType led_type, int mole_id) {
 
-  // assumes rings, linears, then hearts are wired in series
-  // eg. ring1, ..., ring9, linear1,..., linear9, heart1, heart2, heart3
-  // mole ids vary from 1-9
+  int block_size = leds_per_ring + leds_per_linear + leds_per_mole_indicator;
+
   switch (led_type) {
+
     case LedType::Ring:
-      return (mole_id - 1) * leds_per_ring;
+      return (mole_id - 1) * block_size;
+
     case LedType::Linear:
-      return (total_moles * leds_per_ring) + (mole_id - 1) * leds_per_linear;
+      return (mole_id - 1) * block_size + leds_per_ring;
+
     case LedType::Indicator:
-      return (total_moles * leds_per_ring) + (total_moles * leds_per_linear) + (mole_id - 1) * leds_per_mole_indicator;
+      return (mole_id - 1) * block_size + leds_per_ring + leds_per_linear;
+
     case LedType::Heart:
-      return (total_moles * leds_per_ring) + (total_moles * leds_per_linear) + (total_moles * leds_per_mole_indicator);
+      return total_moles * block_size;
+
     default:
       return -1;
   }
