@@ -3,7 +3,7 @@
 
 #include "MoleModule.h"
 
-#define T1_CMPA 3200
+#define T1_CMPA 800
 #define TCA9548A_ADDRESS 0x70
 
 class MoleController
@@ -30,7 +30,7 @@ public:
     void updateAll();
 
     // Returns array of button states from all MoleModules
-    void readButtons(int *arr[]);
+    void readButtons(int (&arr)[8]);
 
     // Call setHp() on MoleModule at index of moles vector
     void setHp(int index, int currHp, int maxHp);

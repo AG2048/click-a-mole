@@ -293,6 +293,8 @@ void GameLogic::fsm()
 
         p_mi->updateAll();
         p_mi->readButtons(buttonStates);
+        // Serial.println("Button pressed game logic");
+
         p_di->show_score(score);                                                               // update score display
         p_di->update_oled_gameplay(level, (numMolesDownThisRound / roundMaxMoles) + 1, score); // update OLED display with current level, round, and score
         unsigned long now = millis();
@@ -370,13 +372,12 @@ void GameLogic::fsm()
             if (buttonStates[i] == 1)
             {
                 handleInput('1' + i); // map button press to corresponding mole hit
-                buttonStates[i] = 0;
             }
             Serial.println(moleArr[i]->getHP());
             Serial.println(moleArr[i]->maxHP);
         }
 
-        p_mi->readButtons(buttonStates); // read button states again after handling input
+        p_mi->updateAll();
 
         for (int i = 0; i < TOTAL_MOLES; i++)
         {
