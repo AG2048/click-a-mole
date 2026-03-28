@@ -146,8 +146,8 @@ bool GameLogic::gameEnded()
 
 GameLogic::GameLogic(DisplayInterface *p_di, MoleController *p_mi)
 {
-    currentGameState = S_IDLE;
-    nextGameState = S_IDLE;
+    currentGameState = S_PLAYING;
+    nextGameState = S_PLAYING;
     // make sure to free any existing memory before allocating new memory for moleArr
     // if (moleArr != nullptr)
     // {
@@ -357,7 +357,7 @@ void GameLogic::fsm()
             }
             else
             {
-                int hp = randomHpForMole(level, lifetime);
+                hp = randomHpForMole(level, lifetime);
                 m->setMaxHP(hp);
                 m->setHP(hp);
             }
@@ -485,6 +485,7 @@ void GameLogic::fsm()
     }
     else if (currentGameState == S_GAMEOVER)
     {
+        Serial.print("Currently in S_GAMEOVER state...");
         p_di->lose_game();                // display lose game animation
         //p_di->display_final_score(score); // display final score on OLED
         p_di->game_over("LOSE");          // display game over animation
