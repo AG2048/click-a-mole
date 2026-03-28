@@ -8,7 +8,7 @@
 #include <Wire.h>
 
 #include "Adafruit_GFX.h"  
-//#include "Adafruit_SSD1306.h"
+#include "Adafruit_SSD1306.h"
 
 //#include "qrcode.h"
 
@@ -154,7 +154,7 @@ class DisplayInterface {
         uint8_t sevenSegAddr = 0x75; // default address?
 
         // OLED Display
-        //Adafruit_SSD1306 oled = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET_PIN);
+        Adafruit_SSD1306 oled = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET_PIN);
         bool oledReady = false;
 
         // Leaderboard/ OLED
