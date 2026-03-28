@@ -228,7 +228,7 @@ void GameLogic::fsm()
         // Serial.println("Press 's' to start the game.");
         p_di->turn_off_score(); // turn off score display
         p_di->idle_state();     // display idle animation on LEDs
-        //p_di->show_idle_oled_animation(); // display idle animation on OLED
+        // p_di->show_idle_oled_animation(); // display idle animation on OLED
         char c = getInput();
         if (c == 's')
         {
@@ -298,8 +298,8 @@ void GameLogic::fsm()
         p_mi->readButtons(buttonStates);
         // Serial.println("Button pressed game logic");
 
-        p_di->show_score(score);                                                               // update score display
-        //p_di->update_oled_gameplay(level, (numMolesDownThisRound / roundMaxMoles) + 1, score); // update OLED display with current level, round, and score
+        p_di->show_score(score); // update score display
+        // p_di->update_oled_gameplay(level, (numMolesDownThisRound / roundMaxMoles) + 1, score); // update OLED display with current level, round, and score
         unsigned long now = millis();
         int idx = rand() % TOTAL_MOLES; // randomly select a hole index to potentially spawn a mole
         Mole *m = moleArr[idx];
@@ -393,6 +393,7 @@ void GameLogic::fsm()
             Serial.println(moleArr[i]->maxHP);
         }
 
+        p_mi->updateAll();               // update mole controller again after handling input to ensure any state changes from hits are registered
         p_mi->readButtons(buttonStates); // read button states again after handling input to ensure we don't miss any quick presses
 
         for (int i = 0; i < TOTAL_MOLES; i++)
@@ -468,7 +469,7 @@ void GameLogic::fsm()
         {
             nextGameState = S_PLAYING;
         }
-
+        p_mi->updateAll(); // update mole controller again at the end of the tick to ensure all state changes are registered
         p_di->process_timed_animations(millis());
     }
     else if (currentGameState == S_INBETWEENLEVELS)
@@ -488,10 +489,10 @@ void GameLogic::fsm()
     else if (currentGameState == S_GAMEOVER)
     {
         Serial.print("Currently in S_GAMEOVER state...");
-        p_di->lose_game();                // display lose game animation
-        //p_di->display_final_score(score); // display final score on OLED
-        p_di->game_over("LOSE");          // display game over animation
-        p_mi->resetHp();                  // TO DO + loop over moles to reset hp and position
+        p_di->lose_game(); // display lose game animation
+        // p_di->display_final_score(score); // display final score on OLED
+        p_di->game_over("LOSE"); // display game over animation
+        p_mi->resetHp();         // TO DO + loop over moles to reset hp and position
         // Handle game over state
         // print game over
         // Serial.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -530,7 +531,7 @@ void GameLogic::fsm()
         // p_di->show_leaderboard();    // display leaderboard
         // p_di->show_leaderboard_qr(); // display QR code for leaderboard
 
-       // nextGameState = S_IDLE;
+        // nextGameState = S_IDLE;
     }
     else
     {
