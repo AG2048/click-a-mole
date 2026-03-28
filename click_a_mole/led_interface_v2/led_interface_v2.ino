@@ -113,71 +113,128 @@
 
 /* BEGIN OF TESTING ROTARY AND OLED */
 
+// #include "led_interface.h"
+
+// DisplayInterface display(1, 1, 1, 1, 1, 4, 1);
+// int printed = 0;
+
+// #define output_A 2
+// #define output_B 3
+
+
+// const int button_pin = 5;
+// int last_button_reading  = HIGH;
+// int prev_button_state    = HIGH;
+// unsigned long last_debounce_ms = 0;
+// const unsigned long DEBOUNCE_MS = 40;
+
+// int accumulated_delta = 0;
+// int final_score = 0;
+
+// bool button_pressed() {               
+//   int current_reading = digitalRead(button_pin);
+
+//   if (current_reading != last_button_reading) {
+//     last_debounce_ms    = millis();
+//     last_button_reading = current_reading;
+//   }
+
+//   if ((millis() - last_debounce_ms) > DEBOUNCE_MS) {
+//     if (prev_button_state == HIGH && current_reading == LOW) {
+//       prev_button_state = current_reading;
+//       Serial.println("Button Pressed");
+//       return true;
+//     }
+//     prev_button_state = current_reading;
+//   }
+//   return false;
+// }
+
+// int read_encoder_delta() {
+//   static int last_encoded = 0b11;
+
+//   int A = digitalRead(output_A);
+//   int B = digitalRead(output_B);
+//   int encoded = (A << 1) | B;
+
+//   int delta = 0;
+//   int transition = (last_encoded << 2) | encoded;
+
+//   switch (transition) {
+//     case 0b1110: case 0b1000: case 0b0001: case 0b0111:
+//       delta = 1;
+//       break;
+//     case 0b1101: case 0b0100: case 0b0010: case 0b1011:
+//       delta = -1;
+//       break;
+//   }
+
+//   last_encoded = encoded;
+//   return delta;
+// }
+
+// void setup() {
+  
+//   pinMode(output_A,   INPUT_PULLUP);
+//   pinMode(output_B,   INPUT_PULLUP);
+//   pinMode(button_pin, INPUT_PULLUP);
+
+//   Serial.begin(9600);
+//   delay(1000);  // give Serial time to connect
+//   Serial.println("Starting...");
+  
+//   display.begin();
+//   Serial.println("Begin done");
+
+//   //display.show_idle_oled_animation();
+//   //display.show_leaderboard_qr();
+//   //display.begin_leaderboard_entry(final_score);
+//   //display.update_oled_gameplay(1, 2, 3);
+//   //display.clear_display();
+//   Serial.println("HI");
+
+
+// }
+
+// void loop() {
+
+//   //display.process_timed_animations(millis());
+
+  
+//   //display.process_timed_animations(millis());
+//   accumulated_delta += read_encoder_delta();
+
+//   int delta_to_send = 0;
+//   if (accumulated_delta >= 4) {
+//     delta_to_send = 1;
+//     accumulated_delta -= 4;
+//   } else if (accumulated_delta <= -4) {
+//     delta_to_send = -1;
+//     accumulated_delta += 4;
+//   }
+
+//   bool btn = button_pressed();
+
+//   if (delta_to_send != 0 || btn) {
+//     bool entry_done = display.update_leaderboard_entry(delta_to_send, 0, btn);
+//     if (entry_done) {
+//       Serial.println("done");
+//     }
+//   }
+// }
+
+/* END OF TESTING ROTARY AND OLED */
+
+/*END OF TESTING REFACTORED OLED AND ENCODER*/
+
 #include "led_interface.h"
 
-DisplayInterface display(3, 3, 1, 1, 5, 4, 1);
-int printed = 0;
-
-#define output_A 2
-#define output_B 3
-
-
-const int button_pin = 5;
-int last_button_reading  = HIGH;
-int prev_button_state    = HIGH;
-unsigned long last_debounce_ms = 0;
-const unsigned long DEBOUNCE_MS = 40;
-
-int accumulated_delta = 0;
+DisplayInterface display(1, 1, 1, 1, 1, 4, 1);
 int final_score = 0;
 
-bool button_pressed() {               
-  int current_reading = digitalRead(button_pin);
-
-  if (current_reading != last_button_reading) {
-    last_debounce_ms    = millis();
-    last_button_reading = current_reading;
-  }
-
-  if ((millis() - last_debounce_ms) > DEBOUNCE_MS) {
-    if (prev_button_state == HIGH && current_reading == LOW) {
-      prev_button_state = current_reading;
-      Serial.println("Button Pressed");
-      return true;
-    }
-    prev_button_state = current_reading;
-  }
-  return false;
-}
-
-int read_encoder_delta() {
-  static int last_encoded = 0b11;
-
-  int A = digitalRead(output_A);
-  int B = digitalRead(output_B);
-  int encoded = (A << 1) | B;
-
-  int delta = 0;
-  int transition = (last_encoded << 2) | encoded;
-
-  switch (transition) {
-    case 0b1110: case 0b1000: case 0b0001: case 0b0111:
-      delta = 1;
-      break;
-    case 0b1101: case 0b0100: case 0b0010: case 0b1011:
-      delta = -1;
-      break;
-  }
-
-  last_encoded = encoded;
-  return delta;
-}
 
 void setup() {
   
-  pinMode(output_A,   INPUT_PULLUP);
-  pinMode(output_B,   INPUT_PULLUP);
-  pinMode(button_pin, INPUT_PULLUP);
 
   Serial.begin(9600);
   delay(1000);  // give Serial time to connect
@@ -186,9 +243,9 @@ void setup() {
   display.begin();
   Serial.println("Begin done");
 
-  //display.show_idle_oled_animation();
+  display.show_idle_oled_animation();
   //display.show_leaderboard_qr();
-  display.begin_leaderboard_entry(final_score);
+  //display.begin_leaderboard_entry(final_score);
   //display.update_oled_gameplay(1, 2, 3);
   //display.clear_display();
   Serial.println("HI");
@@ -198,29 +255,9 @@ void setup() {
 
 void loop() {
 
-    display.process_timed_animations(millis());
+  display.process_timed_animations(millis());
+  //display.encoder_to_leaderboard();
 
-  
-  //display.process_timed_animations(millis());
-  accumulated_delta += read_encoder_delta();
-
-  int delta_to_send = 0;
-  if (accumulated_delta >= 4) {
-    delta_to_send = 1;
-    accumulated_delta -= 4;
-  } else if (accumulated_delta <= -4) {
-    delta_to_send = -1;
-    accumulated_delta += 4;
   }
 
-  bool btn = button_pressed();
-
-  if (delta_to_send != 0 || btn) {
-    bool entry_done = display.update_leaderboard_entry(delta_to_send, 0, btn);
-    if (entry_done) {
-      Serial.println("done");
-    }
-  }
-}
-
-/* END OF TESTING ROTARY AND OLED */
+/*END OF TESTING REFACTORED OLED AND ENCODER*/

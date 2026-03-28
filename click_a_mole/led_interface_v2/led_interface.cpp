@@ -66,18 +66,23 @@ const unsigned char diglett[] PROGMEM = {
 void DisplayInterface::begin() {
   Wire.begin();
   Serial.println("Wire OK");
-  
+
   sevenSeg.begin(0x75);
   Serial.println("7seg OK");
-  
+
   sevenSeg.clear();
   sevenSeg.writeDisplay();
   sevenSegReady = true;
   Serial.println("7seg ready");
-  
-  // oledReady = oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_I2C_ADDRESS);
-  // Serial.println("OLED done");
-  // Serial.println(oledReady);
+
+  oledReady = oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_I2C_ADDRESS);
+  Serial.println("OLED done");
+  Serial.println(oledReady);
+
+
+  pinMode(output_A, INPUT_PULLUP);
+  pinMode(output_B, INPUT_PULLUP);
+  pinMode(button_pin, INPUT_PULLUP);
 }
 
 // Constructor
@@ -121,6 +126,7 @@ DisplayInterface::~DisplayInterface() {
     leds = nullptr;
   }
 
+  remove_all_animation();
 }
 
 // Function starts the ring timer and hp bar for each mole
@@ -268,7 +274,7 @@ void DisplayInterface::win_round() {
   AnimationObject* secondRow = queue_animation(LedType::Ring, AnimationCategory::Solid, 3, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
   queue_animation(LedType::Ring, AnimationCategory::Solid, 4, firstRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
 
-  
+
   // light thrid row
   queue_animation(LedType::Ring, AnimationCategory::Solid, 5, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
   queue_animation(LedType::Ring, AnimationCategory::Solid, 6, secondRow->end_time_ms, 667, -1, -1, nullptr, Colour::Green);
@@ -356,31 +362,31 @@ void DisplayInterface::process_timed_animations(unsigned long current_time_ms) {
   FastLED.show();
 
 
-  // /* OLED FINAL SCORE */
+  /* OLED FINAL SCORE */
 
-  // if (final_score_active) {
-  //   if (!final_score_drawn) {
-  //     oled.clearDisplay();
-  //     oled.setTextSize(2);
+  if (final_score_active) {
+    if (!final_score_drawn) {
+      oled.clearDisplay();
+      oled.setTextSize(2);
 
-  //     oled.setTextColor(WHITE);
-  //     oled.setCursor(15, 20);
-  //     oled.print("Score:");
-  //     oled.setCursor(50, 40);
-  //     oled.print(final_score_value);
-  //     oled.display();
-  //     final_score_drawn = true;
-  //   }
-  // }
+      oled.setTextColor(WHITE);
+      oled.setCursor(15, 20);
+      oled.print("Score:");
+      oled.setCursor(50, 40);
+      oled.print(final_score_value);
+      oled.display();
+      final_score_drawn = true;
+    }
+  }
 
 
-//   // Change the condition to also require final_score_active:
-// if (final_score_active && current_time_ms >= final_score_end_time_ms) {
-//     final_score_active = false;
-//     final_score_drawn = false;
-//     if (oledReady) show_idle_oled_animation();
-// }
-  
+  // Change the condition to also require final_score_active:
+  if (final_score_active && current_time_ms >= final_score_end_time_ms) {
+    final_score_active = false;
+    final_score_drawn = false;
+    if (oledReady) show_idle_oled_animation();
+  }
+
   // // QR CODE DISPLAY TIMEOUT
   // if (qr_active && current_time_ms >= qr_end_time_ms) {
   //   qr_active = false;
@@ -398,7 +404,7 @@ void DisplayInterface::win_game() {
 
   // Animation goes in a circle 3 times 1->2->3->4->8->7->6->5
   // could loop through an array with the proper mole ids
-  int path[] = { 0, 1, 2, 3, 7, 6, 5, 4};
+  int path[] = { 0, 1, 2, 3, 7, 6, 5, 4 };
 
   int start_delay = 0;
 
@@ -452,7 +458,7 @@ void DisplayInterface::idle_state() {
   for (int mole_id = 0; mole_id < total_moles; mole_id++) {
     int starting_index = convert_led_type_to_led_index(LedType::Ring, mole_id);
 
-    for(int index = starting_index; index < starting_index + leds_per_ring; index++) {
+    for (int index = starting_index; index < starting_index + leds_per_ring; index++) {
       leds[index] = convert_to_crgb(Colour::Dim_Yellow);
     }
   }
@@ -486,7 +492,6 @@ void DisplayInterface::game_start() {
   show_score(0);
   remove_all_animation();
   FastLED.show();
-
 }
 
 void DisplayInterface::game_over(const String& result) {
@@ -510,7 +515,7 @@ void DisplayInterface::game_over(const String& result) {
 // // OLED
 // // *************************************
 
-void DisplayInterface::clear_display(){
+void DisplayInterface::clear_display() {
   oled.clearDisplay();
 }
 
@@ -591,9 +596,9 @@ void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char f
     name += second_letter;
     name += third_letter;
 
-  if (is_score_in_leaderboard(entry_score)) {  // guard here
-    add_to_leaderboard(name, entry_score);
-  }
+    if (is_score_in_leaderboard(entry_score)) {  // guard here
+      add_to_leaderboard(name, entry_score);
+    }
     return;
   }
 
@@ -662,7 +667,7 @@ void DisplayInterface::begin_leaderboard_entry(int final_score) {
 
 
 // PUBLIC: Returns true once the 3rd letter is confirmed and saved.
-bool DisplayInterface::update_leaderboard_entry(int encoder_delta, int unused, bool button_pressed) {
+bool DisplayInterface::update_leaderboard_entry(int encoder_delta, bool btn_pressed) {
 
   // ROTARY ENCODER — ignore rotation while waiting for confirm click
   if (encoder_delta != 0 && !entry_awaiting_confirm) {
@@ -677,7 +682,7 @@ bool DisplayInterface::update_leaderboard_entry(int encoder_delta, int unused, b
   }
 
   // BUTTON
-  if (button_pressed) {
+  if (btn_pressed) {
 
     // ── Confirm click after all 3 letters placed ──
     if (entry_awaiting_confirm) {
@@ -781,42 +786,42 @@ void DisplayInterface::add_to_leaderboard(const String& name, int score) {
   }
 }
 
-void DisplayInterface::show_leaderboard() {
-    oled.clearDisplay();
-    oled.setTextColor(SSD1306_WHITE);
+// void DisplayInterface::show_leaderboard() {
+//     oled.clearDisplay();
+//     oled.setTextColor(SSD1306_WHITE);
 
-    // Title
-    oled.setTextSize(1);
-    oled.setCursor(25, 0);
-    oled.print("LEADERBOARD");
+//     // Title
+//     oled.setTextSize(1);
+//     oled.setCursor(25, 0);
+//     oled.print("LEADERBOARD");
 
-    // Divider line
-    oled.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
+//     // Divider line
+//     oled.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
 
-    if (leaderboardSize == 0) {
-        oled.setCursor(20, 30);
-        oled.print("Empty...");
-        oled.display();
-        return;
-    }
+//     if (leaderboardSize == 0) {
+//         oled.setCursor(20, 30);
+//         oled.print("Empty...");
+//         oled.display();
+//         return;
+//     }
 
-    // Each entry: "1. AAA  1234"
-    for (int i = 0; i < leaderboardSize; i++) {
-        int y = 14 + i * 12;
+//     // Each entry: "1. AAA  1234"
+//     for (int i = 0; i < leaderboardSize; i++) {
+//         int y = 14 + i * 12;
 
-        oled.setCursor(0, y);
-        oled.print(i + 1);
-        oled.print(".");
+//         oled.setCursor(0, y);
+//         oled.print(i + 1);
+//         oled.print(".");
 
-        oled.setCursor(14, y);
-        oled.print(leaderboard[i].userame);
+//         oled.setCursor(14, y);
+//         oled.print(leaderboard[i].userame);
 
-        oled.setCursor(70, y);
-        oled.print(leaderboard[i].score);
-    }
+//         oled.setCursor(70, y);
+//         oled.print(leaderboard[i].score);
+//     }
 
-    oled.display();
-}
+//     oled.display();
+// }
 
 //*************************************
 //QR Code
@@ -988,13 +993,13 @@ int DisplayInterface::convert_led_type_to_led_index(LedType led_type, int mole_i
   switch (led_type) {
 
     case LedType::Ring:
-      return (mole_id) * block_size;
+      return (mole_id)*block_size;
 
     case LedType::Linear:
-      return (mole_id) * block_size + leds_per_ring;
+      return (mole_id)*block_size + leds_per_ring;
 
     case LedType::Indicator:
-      return (mole_id) * block_size + leds_per_ring + leds_per_linear;
+      return (mole_id)*block_size + leds_per_ring + leds_per_linear;
 
     case LedType::Heart:
       return total_moles * block_size;
@@ -1216,4 +1221,79 @@ void DisplayInterface::write4(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3) {
   sevenSeg.writeDigitRaw(3, d2);
   sevenSeg.writeDigitRaw(4, d3);
   sevenSeg.writeDisplay();
+}
+
+// rotary
+
+bool DisplayInterface::button_pressed() {
+  int current_reading = digitalRead(button_pin);
+
+  if (current_reading != last_button_reading) {
+    last_debounce_ms = millis();
+    last_button_reading = current_reading;
+  }
+
+  if ((millis() - last_debounce_ms) > DEBOUNCE_MS) {
+    if (prev_button_state == HIGH && current_reading == LOW) {
+      prev_button_state = current_reading;
+      Serial.println("Button Pressed");
+      return true;
+    }
+    prev_button_state = current_reading;
+  }
+  return false;
+}
+
+int DisplayInterface::read_encoder_delta() {
+  static int last_encoded = 0b11;
+
+  int A = digitalRead(output_A);
+  int B = digitalRead(output_B);
+  int encoded = (A << 1) | B;
+
+  int delta = 0;
+  int transition = (last_encoded << 2) | encoded;
+
+  switch (transition) {
+    case 0b1110:
+    case 0b1000:
+    case 0b0001:
+    case 0b0111:
+      delta = 1;
+      break;
+    case 0b1101:
+    case 0b0100:
+    case 0b0010:
+    case 0b1011:
+      delta = -1;
+      break;
+  }
+
+  last_encoded = encoded;
+  return delta;
+}
+
+
+// public
+
+void DisplayInterface::encoder_to_leaderboard() {
+  accumulated_delta += read_encoder_delta();
+
+  int delta_to_send = 0;
+  if (accumulated_delta >= 4) {
+    delta_to_send = 1;
+    accumulated_delta -= 4;
+  } else if (accumulated_delta <= -4) {
+    delta_to_send = -1;
+    accumulated_delta += 4;
+  }
+
+  bool btn = button_pressed();
+
+  if (delta_to_send != 0 || btn) {
+    bool entry_done = update_leaderboard_entry(delta_to_send, btn);
+    if (entry_done) {
+      Serial.println("done");
+    }
+  }
 }
