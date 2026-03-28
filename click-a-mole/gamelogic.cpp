@@ -505,36 +505,36 @@ void GameLogic::fsm()
     else if (currentGameState == S_LEADERBOARD)
     {
         // Handle leaderboard state
-        // string input;
-        // while (input.length() == 0)
-        // {
-        //     // Serial.print("Enter your name for the leaderboard: ");
-        //     getline(cin, input);
-        //     stringstream line(input);
-        // }
+        string input = getInput();
+        while (input.length() == 0)
+        {
+            Serial.print("Enter your name for the leaderboard: ");
+            getline(cin, input);
+           stringstream line(input);
+         }
 
         // // display line on the leaderboard
-        // // Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
+        Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
 
-        // p_di->display_final_score(score); // display final score on OLED
+        p_di->display_final_score(score); // display final score on OLED
 
-        // // only ask for name if score is in the leaderboard
-        // if (p_di->is_score_in_leaderboard(score))
-        // {
-        //     p_di->begin_leaderboard_entry(score); // display leaderboard entry animation
+        // only ask for name if score is in the leaderboard
+        if (p_di->is_score_in_leaderboard(score))
+        {
+            p_di->begin_leaderboard_entry(score); // display leaderboard entry animation
 
-        //     // wait for player to enter name
-        //     while (!p_di->update_leaderboard_entry(0, 0, false))
-        //         ;
-        // }
-        // p_di->show_leaderboard();    // display leaderboard
-        // p_di->show_leaderboard_qr(); // display QR code for leaderboard
+            // wait for player to enter name
+            while (!p_di->update_leaderboard_entry(0, 0, false))
+                ;
+        }
+        p_di->show_leaderboard();    // display leaderboard
+        p_di->show_leaderboard_qr(); // display QR code for leaderboard
 
-       // nextGameState = S_IDLE;
+       nextGameState = S_IDLE;
     }
     else
     {
-        // Serial.print("Unknown game state!");
+        Serial.print("Unknown game state!");
     }
     currentGameState = nextGameState;
 }
