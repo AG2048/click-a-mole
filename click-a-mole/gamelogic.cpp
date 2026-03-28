@@ -62,6 +62,7 @@ void GameLogic::handleInput(char c)
     {
     case 'q':
         // Serial.println("Escape key pressed. Exiting game.");
+        nextGameState = S_IDLE;
         break;
     case '1':
         moleArr[0]->decreaseHp(1, p_di, p_mi);
@@ -246,6 +247,7 @@ void GameLogic::fsm()
         {
             moles_interface[i] = '0';
         }
+        lives = 3; // reinitialize lives
         Serial.print(F("Game initialized. Starting first round."));
         nextGameState = S_INITIALIZE_ROUND;
         p_di->game_start(); // display game start animation
@@ -498,6 +500,7 @@ void GameLogic::fsm()
 
         // delay to simulate display time
         // nextGameState = S_LEADERBOARD;
+        nextGameState = S_IDLE;
     }
     else if (currentGameState == S_LEADERBOARD)
     {
