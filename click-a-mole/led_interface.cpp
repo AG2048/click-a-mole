@@ -1297,34 +1297,3 @@ void DisplayInterface::encoder_to_leaderboard() {
     }
   }
 }
-
-void DisplayInteface::show_difficulty_menu(int& selected_difficulty) {
-
-  accumulated_delta += read_encoder_delta();
-
-  int delta_to_send = 0;
-  if (accumulated_delta >= 4) {
-    delta_to_send = 1;
-    accumulated_delta -= 4;
-  } else if (accumulated_delta <= -4) {
-    delta_to_send = -1;
-    accumulated_delta += 4;
-  }
-
-  bool btn = button_pressed();
-
-  if (delta_to_send != 0 || btn) {
-    bool entry_done = update_difficulty_menu(delta_to_send, btn);
-    if (entry_done) {
-      Serial.println("done");
-    }
-  }
-
-  // josh should co
-
-
-
-
-
-}
-  
