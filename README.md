@@ -29,6 +29,9 @@ Click A Mole :> Actuatator Team
   ...
 ```
 
+## NOTE ABOUT FUNCTIONALITY
+As of March 28, Gamelogic is sucessfully integrated with LEDs. Actuators not yet.
+
 
 ## Editing Convention
 
