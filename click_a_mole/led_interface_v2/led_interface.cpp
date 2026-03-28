@@ -516,12 +516,14 @@ void DisplayInterface::game_over(const String& result) {
 // // *************************************
 
 void DisplayInterface::clear_display() {
+  idleOledActive = false;
   oled.clearDisplay();
 }
 
 
 void DisplayInterface::update_oled_gameplay(int current_level, int current_round, int score) {
   // Implementation for updating OLED display during gameplay
+  idleOledActive = false;
   oled.clearDisplay();
   oled.setTextSize(1);
   oled.setTextColor(WHITE);
@@ -543,6 +545,7 @@ void DisplayInterface::update_oled_gameplay(int current_level, int current_round
 
 void DisplayInterface::show_idle_oled_animation() {
   // Implementation for idle animation on OLED display
+  if (idleOledActive) return;
   oled.clearDisplay();
   oled.setTextSize(1);
 
@@ -554,10 +557,12 @@ void DisplayInterface::show_idle_oled_animation() {
   int x = (SCREEN_WIDTH - 64) / 2;
   int y = (SCREEN_HEIGHT - 64) / 2 + 10;
   oled.drawBitmap(x, y, diglett, 64, 64, SSD1306_WHITE);
+  idleOledActive = true;
   oled.display();
 }
 
 void DisplayInterface::display_final_score(int final_score) {
+  idleOledActive = false;
   final_score_active = true;
   final_score_drawn = false;
   final_score_value = final_score;
@@ -584,6 +589,8 @@ bool DisplayInterface::is_score_in_leaderboard(int score) {
 
 void DisplayInterface::entering_names_to_leaderboard(char hovered_letter, char first_letter, char second_letter, char third_letter,
                                                      int final_score, uint8_t fill_index, bool confirm) {
+
+  
 
   if (fill_index > NAME_LENGTH - 1) {
     fill_index = NAME_LENGTH - 1;  // cap fill index to 2, as there are only 3 letters MAKE THIS A CONSTANT: MAX_NAME_LENGTH = 3
@@ -786,42 +793,42 @@ void DisplayInterface::add_to_leaderboard(const String& name, int score) {
   }
 }
 
-// void DisplayInterface::show_leaderboard() {
-//     oled.clearDisplay();
-//     oled.setTextColor(SSD1306_WHITE);
+void DisplayInterface::show_leaderboard() {
+    oled.clearDisplay();
+    oled.setTextColor(SSD1306_WHITE);
 
-//     // Title
-//     oled.setTextSize(1);
-//     oled.setCursor(25, 0);
-//     oled.print("LEADERBOARD");
+    // Title
+    oled.setTextSize(1);
+    oled.setCursor(25, 0);
+    oled.print("LEADERBOARD");
 
-//     // Divider line
-//     oled.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
+    // Divider line
+    oled.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
 
-//     if (leaderboardSize == 0) {
-//         oled.setCursor(20, 30);
-//         oled.print("Empty...");
-//         oled.display();
-//         return;
-//     }
+    if (leaderboardSize == 0) {
+        oled.setCursor(20, 30);
+        oled.print("Empty...");
+        oled.display();
+        return;
+    }
 
-//     // Each entry: "1. AAA  1234"
-//     for (int i = 0; i < leaderboardSize; i++) {
-//         int y = 14 + i * 12;
+    // Each entry: "1. AAA  1234"
+    for (int i = 0; i < leaderboardSize; i++) {
+        int y = 14 + i * 12;
 
-//         oled.setCursor(0, y);
-//         oled.print(i + 1);
-//         oled.print(".");
+        oled.setCursor(0, y);
+        oled.print(i + 1);
+        oled.print(".");
 
-//         oled.setCursor(14, y);
-//         oled.print(leaderboard[i].userame);
+        oled.setCursor(14, y);
+        oled.print(leaderboard[i].userame);
 
-//         oled.setCursor(70, y);
-//         oled.print(leaderboard[i].score);
-//     }
+        oled.setCursor(70, y);
+        oled.print(leaderboard[i].score);
+    }
 
-//     oled.display();
-// }
+    oled.display();
+}
 
 //*************************************
 //QR Code

@@ -161,6 +161,7 @@ private:
   // OLED Display
   Adafruit_SSD1306 oled = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET_PIN);
   bool oledReady = false;
+  bool idleOledActive = false;
 
   // Leaderboard/ OLED
   static const int MAX_LEADERBOARD_ENTRIES = 1;

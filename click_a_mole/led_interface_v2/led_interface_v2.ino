@@ -243,11 +243,12 @@ void setup() {
   display.begin();
   Serial.println("Begin done");
 
-  display.show_idle_oled_animation();
+  //display.show_idle_oled_animation();
   //display.show_leaderboard_qr();
   //display.begin_leaderboard_entry(final_score);
   //display.update_oled_gameplay(1, 2, 3);
   //display.clear_display();
+  display.show_leaderboard();
   Serial.println("HI");
 
 
@@ -256,7 +257,7 @@ void setup() {
 void loop() {
 
   display.process_timed_animations(millis());
-  //display.encoder_to_leaderboard();
+  display.encoder_to_leaderboard();
 
   }
 
