@@ -230,15 +230,16 @@ void GameLogic::fsm()
         p_di->idle_state();     // display idle animation on LEDs
         //p_di->show_idle_oled_animation(); // display idle animation on OLED
         char c = getInput();
-        if (c == 's')
-        {
-            // srand(millis()); // seed random number generator
-            nextGameState = S_INITIALIZE_GAME;
-        }
-        else
-        {
-            nextGameState = S_IDLE;
-        }
+        // if (c == 's')
+        // {
+        //     // srand(millis()); // seed random number generator
+        //     nextGameState = S_INITIALIZE_GAME;
+        // }
+        // else
+        // {
+        //     nextGameState = S_IDLE;
+        // }
+        nextGameState = S_LEADERBOARD;
         // p->di idle display animation
     }
     else if (currentGameState == S_INITIALIZE_GAME)
@@ -499,8 +500,7 @@ void GameLogic::fsm()
         // Serial.print("\n\n"
 
         // delay to simulate display time
-        // nextGameState = S_LEADERBOARD;
-        nextGameState = S_IDLE;
+        nextGameState = S_LEADERBOARD;
     }
     else if (currentGameState == S_LEADERBOARD)
     {
@@ -513,7 +513,7 @@ void GameLogic::fsm()
            stringstream line(input);
          }
 
-        // // display line on the leaderboard
+        // display line on the leaderboard
         Serial.print("Thank you for playing, " + String(input.c_str()) + "!");
 
         p_di->display_final_score(score); // display final score on OLED
